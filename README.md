@@ -44,7 +44,7 @@ Shapefiles to map polygons at distict level can be downloaded from the website *
 Source:
 https://datos.cdmx.gob.mx/explore/dataset/coloniascdmx/export/
 
-+ coloniascdmx.shp
++ coloniascdmx.shp (2.1 Mb)
 
 Additionally, district, boroughs and state level spatial data are available from the GADM webpage in the following formats: 
 

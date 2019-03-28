@@ -39,6 +39,12 @@ https://www.inegi.org.mx/app/biblioteca/ficha.html?upc=889463674658
     + 09_ent.shp (43 Kb)
     + 09_mun.shp (261 Kb)
   + metadatos
+  
+Shapefiles to map polygons at distict level can be downloaded from the website *Datos Abiertos Ciudad de México*.
+Source:
+https://datos.cdmx.gob.mx/explore/dataset/coloniascdmx/export/
+
++ coloniascdmx.shp
 
 Additionally, district, boroughs and state level spatial data are available from the GADM webpage in the following formats: 
 

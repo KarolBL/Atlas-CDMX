@@ -130,19 +130,61 @@ do.call(rbind, lapply(radiation, dim))
 # UVA 1174704    6
 # UVB 1122096    6
 
+######################################################################
+# - Download Meteorological Data Archives
+#?download_meteorological	
+years <- 2000:2018
+metereological <- mclapply(
+  years,
+  download_meteorological,
+  progress = TRUE
+)
+names(metereological) <- as.character(years)
+do.call(rbind, lapply(metereological, dim))
+
+#Join all the years 
+metereological_all <- do.call(rbind, metereological)
+table(metereological_all$)
+
+#Split them by metereological
+metereologicals <- lapply(
+  unique(metereological_all$),
+  function(metereological){
+    subset(
+      metereological_all,
+       == metereological
+    )    
+  }
+)
+names(metereologicals) <- unique(metereological_all$)
+save(metereologicals, file = "../results/metereologicals.RData", compress = "xz")
+
+#Split the metereologicals in separate archives
+mclapply(
+  names(metereologicals),
+  function(x){
+    metereological <- metereologicals[[x]]
+    save(metereological, file = paste("../results/", x, ".RData", sep = ""), compress = "xz")    
+  }
+)
+
+
+
+
+# - Download Atmospheric Pressure Archives
+download_pressure	
+
+
 # - Download Acid Rain Measurements Archives
-download_deposition	
+#?download_deposition	
 
 
 
 # - Download Lead Pollution Archives
 download_lead	
 
-# - Download Meteorological Data Archives
-download_meteorological	
 
-# - Download Atmospheric Pressure Archives
-download_pressure	
+
 
 ##get_latest_imeca	Get the latest pollution values for each station
 

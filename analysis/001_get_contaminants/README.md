@@ -37,7 +37,13 @@ R package: ``aire.zmvm``
 - 1.1M	UVA.RData
 - 924K	UVB.RData
 
+### Metereological 
+- 112K	PBa.RData
+- 2.7M	RH.RData
+- 3.5M	TMP.RData
+- 4.2M	WDR.RData
+- 3.1M	WSP.RData
+
 ### Station data
 - 12K	stations.tab
 - 8.0K	zones.tab
-

@@ -20,3 +20,18 @@ Parallel independent data contaminants,temp and wind outputs + station location
 ## Requirements
 
 R package: ``aire.zmvm`` 
+
+## Results files
+
+- 2.6M	CO.RData
+- 3.1M	NO2.RData
+- 3.1M	NO.RData
+- 3.6M	NOX.RData
+- 3.5M	O3.RData
+- 2.9M	PM10.RData
+- 1.9M	PM25.RData
+- 1.2M	PMCO.RData
+- 2.7M	SO2.RData
+- 12K	stations.tab
+- 8.0K	zones.tab
+

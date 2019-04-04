@@ -134,6 +134,7 @@ do.call(rbind, lapply(radiation, dim))
 # - Download Meteorological Data Archives
 #?download_meteorological	
 years <- 2000:2018
+test <- download_meteorological(2000, progress = TRUE)
 metereological <- mclapply(
   years,
   download_meteorological,
@@ -141,22 +142,44 @@ metereological <- mclapply(
 )
 names(metereological) <- as.character(years)
 do.call(rbind, lapply(metereological, dim))
+#        [,1] [,2]
+# 2000 386496    6
+# 2001 490560    6
+# 2002 490560    6
+# 2003 490560    6
+# 2004 500688    6
+# 2005 508080    6
+# 2006 490560    6
+# 2007 490560    6
+# 2008 535824    6
+# 2009 551880    6
+# 2010 551880    6
+# 2011 551880    6
+# 2012 626880    6
+# 2013 639480    6
+# 2014 639480    6
+# 2015 754728    6
+# 2016 920496    6
+# 2017 919800    6
+# 2018 919800    6
 
 #Join all the years 
 metereological_all <- do.call(rbind, metereological)
-table(metereological_all$)
+table(metereological_all$pollutant)
+#   PBa      RH     TMP     WDR     WSP 
+# 87648 2931936 2826912 2806848 2806848
 
 #Split them by metereological
 metereologicals <- lapply(
-  unique(metereological_all$),
+  unique(metereological_all$pollutant),
   function(metereological){
     subset(
       metereological_all,
-       == metereological
+      pollutant == metereological
     )    
   }
 )
-names(metereologicals) <- unique(metereological_all$)
+names(metereologicals) <- unique(metereological_all$pollutant)
 save(metereologicals, file = "../results/metereologicals.RData", compress = "xz")
 
 #Split the metereologicals in separate archives

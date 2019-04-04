@@ -124,6 +124,11 @@ radiation <- mclapply(
   get_radiation,
   years
 )
+names(radiation) <- c("UVA", "UVB")
+do.call(rbind, lapply(radiation, dim))
+#        [,1] [,2]
+# UVA 1174704    6
+# UVB 1122096    6
 
 # - Download Acid Rain Measurements Archives
 download_deposition	

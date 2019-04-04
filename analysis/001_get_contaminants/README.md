@@ -22,7 +22,7 @@ Parallel independent data contaminants,temp and wind outputs + station location
 R package: ``aire.zmvm`` 
 
 ## Results files
-
+### Contaminats
 - 2.6M	CO.RData
 - 3.1M	NO2.RData
 - 3.1M	NO.RData
@@ -32,6 +32,12 @@ R package: ``aire.zmvm``
 - 1.9M	PM25.RData
 - 1.2M	PMCO.RData
 - 2.7M	SO2.RData
+
+### Radiation
+- 1.1M	UVA.RData
+- 924K	UVB.RData
+
+### Station data
 - 12K	stations.tab
 - 8.0K	zones.tab
 

@@ -168,23 +168,14 @@ mclapply(
   }
 )
 
-
-
-
 # - Download Atmospheric Pressure Archives
-download_pressure	
-
+#?download_pressure	
 
 # - Download Acid Rain Measurements Archives
 #?download_deposition	
 
-
-
 # - Download Lead Pollution Archives
-download_lead	
-
-
-
+#? download_lead	
 
 ##get_latest_imeca	Get the latest pollution values for each station
 

@@ -102,7 +102,8 @@ mclapply(
 
 #Get all the radiation per year
 years <- 2000:2018
-type <- "UVA" #long wave ultraviolet A
+"UVA" #long wave ultraviolet A
+"UVB" # short wave ultraviolet B
 get_radiation <- function(type, years){
   radiation <- mclapply(
     years,
@@ -113,13 +114,16 @@ get_radiation <- function(type, years){
   names(radiation) <- as.character(years)
   radiation_all <- do.call(rbind, radiation)
   #table(radiation$pollutant)
-  save(radiation_all, file = paste(type, ".RData"), compress = "xz")
+  save(radiation_all, file = paste("../results/", type, ".RData", sep = ""), compress = "xz")
   return(radiation_all)
 }
 
 #Finally, get the data
-uva <- get_radiation(type = "UVA", years)
-uvb <- get_radiation(type = "UVB", years)
+radiation <- mclapply(
+  c("UVA", "UVB"),
+  get_radiation,
+  years
+)
 
 # - Download Acid Rain Measurements Archives
 download_deposition	

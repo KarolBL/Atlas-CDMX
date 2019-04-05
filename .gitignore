@@ -2,5 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
-.bin.Rproj
+*bin.Rproj
 data*

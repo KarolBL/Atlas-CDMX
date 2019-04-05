@@ -5,7 +5,6 @@
 library("aire.zmvm")
 library("optparse")
 library("parallel")
-options(mc.cores = 7)
 ############################################################
 option_list <- list(
   make_option(
@@ -13,13 +12,21 @@ option_list <- list(
     type = "character", 
     default = NULL, 
     help = "dataset file name", 
-    metavar = "character"),
+    metavar = "character"
+  ),
   make_option(
     c("-o", "--out"), 
     type = "character", 
-    default = "out.txt", 
-    help = "output file name [default= %default]", 
+    default = "out.RData", 
+    help = "output RData file name [default= %default]", 
     metavar = "character"
+  ),
+  make_option(
+    c("-c", "--cores"), 
+    type = "integer", 
+    default = "1", 
+    help = "number of cores to use [default= %default]", 
+    metavar = "integer"
   )
 ) 
 
@@ -36,6 +43,7 @@ if(is.null(opt$file)){
 # Debuging
 # opt$file <- "../data/CO.RData"
 # opt$out <- "../results/CO.RData"
+options(mc.cores = opt$cores)
 ############################################################
 #Filtering criteria
 # 1.- Average day if more than 18 hours (75%).
@@ -166,7 +174,9 @@ contaminant_week <- lapply(
 ##Join contaminat summarized by week
 contaminant_week <- do.call(rbind, contaminant_week)
 contaminant_week <- na.omit(contaminant_week)
+contaminant <- contaminant_week
 
 ############################################################
-
+#Save the data
+save(contaminant, file = opt$out, compress = "xz")
 

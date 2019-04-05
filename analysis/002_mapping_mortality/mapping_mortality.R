@@ -11,8 +11,6 @@ library(sf)
 library(rgdal) 
 library(viridis)
 library(rvest)
-#Google's Terms of Service: https://cloud.google.com/maps-platform/terms/.
-#Please cite ggmap if you use it! See citation("ggmap") for details.
 ###########################################################
 # DATA
 ###########################################################
@@ -150,17 +148,3 @@ ggplot(data = mortality_by_borough_tibble, # the input data
 
  ggsave("facet_cdmx.png", width = 9, height = 9) # save figure
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-#https://rstudio-pubs-static.s3.amazonaws.com/301056_e188ebc4c8644410b4abbc4ae98b6c98.html

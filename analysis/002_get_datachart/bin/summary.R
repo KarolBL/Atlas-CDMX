@@ -98,7 +98,7 @@ contaminant_day <- lapply(
 
 #Summary by week  
 #For each station
-lapply(
+contaminant_week <- lapply(
   contaminant_day,
   function(station){
     #Get the julian day / 7 + 1, to get the week number
@@ -158,11 +158,15 @@ lapply(
     #Join the years 
     station_year <- do.call(rbind, station_year)
     station_year <- na.omit(station_year)
-    
+
+    return(station_year)    
   }
 )
 
+##Join contaminat summarized by week
+contaminant_week <- do.call(rbind, contaminant_week)
+contaminant_week <- na.omit(contaminant_week)
 
-
+############################################################
 
 

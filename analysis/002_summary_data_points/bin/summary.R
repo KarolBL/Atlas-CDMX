@@ -63,6 +63,12 @@ if( "metereological" %in% ls()){
   rm(metereological)
 }
 
+if( "radiation_all" %in% ls()){
+  contaminant <- radiation_all
+  rm(radiation_all)
+}
+
+
 #Remove NA data points
 contaminant <- na.omit(contaminant)
 row.names(contaminant) <- NULL

@@ -1,0 +1,12 @@
+<config.mk
+
+#Obtain the summarized data by week, for each contaminant under each station
+results/%.RData: data/%.RData
+	set -x
+	mkdir -p `dirname $target`
+ 	Rscript bin/summary.R \
+		--file $prereq \
+		--out $target".build" \
+		--cores $NT \
+	&& mv $target".build" $target
+

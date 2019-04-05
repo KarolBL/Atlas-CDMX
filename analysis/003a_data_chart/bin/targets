@@ -1,0 +1,6 @@
+#!/bin/bash
+find -L data \
+       -type f \
+       -name "*.RData" \
+| sed -r \
+	-e "s#^data#results#g"

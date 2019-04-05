@@ -41,8 +41,8 @@ if(is.null(opt$file)){
 }
 ############################################################
 # Debuging
-# opt$file <- "../data/CO.RData"
-# opt$out <- "../results/CO.RData"
+# opt$file <- "../data/TMP.RData"
+# opt$out <- "../results/TMP.RData"
 options(mc.cores = opt$cores)
 ############################################################
 #Filtering criteria
@@ -57,6 +57,11 @@ min_week <- 4   # To consider 5 data points
 ############################################################
 #Load the contaminant data.frame object
 load(opt$file)
+
+if( "metereological" %in% ls()){
+  contaminant <- metereological
+  rm(metereological)
+}
 
 #Remove NA data points
 contaminant <- na.omit(contaminant)

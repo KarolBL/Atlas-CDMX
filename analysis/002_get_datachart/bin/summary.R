@@ -39,8 +39,9 @@ if(is.null(opt$file)){
 ############################################################
 #Filtering criteria
 # 1.- Average day if more than 18 hours (75%).
-min_hours <- 18
+min_hours <- 17 # To consider 18 data points
 # 2.- Average week if more than 5.25 days (75%).
+min_week <- 4   # To consider 5 data points
 # 3.- Average month if more than 22 days (75%).
 # 4.- Average trimester if more than 67.5 days (75%).
 # 5.- Average semester if more than 135 days (75%).
@@ -79,6 +80,7 @@ contaminant_day <- lapply(
           mean(datapoints$value)
         )
         
+        #Format output
         datapoints <- datapoints[1, , drop = FALSE]
         datapoints$hour <- NULL
         datapoints$value <- out
@@ -95,5 +97,72 @@ contaminant_day <- lapply(
 )
 
 #Summary by week  
-contaminant_day
+#For each station
+lapply(
+  contaminant_day,
+  function(station){
+    #Get the julian day / 7 + 1, to get the week number
+    station$week <- as.integer(
+      strftime(
+        station$date, 
+        format = "%j"
+      )
+    )%/%7+1
+    station$week[station$week == 53] <- 52
+    
+    #Get the year
+    station$year <- as.integer(
+      strftime(
+        station$date, 
+        format = "%Y"
+      )
+    )
+    
+    #For each year
+    station_year <- lapply(
+      unique(station$year),
+      function(year_number){
+        #For each week under a year
+        station_week <- lapply(
+          unique(station$week),
+          function(week_number){
+            datapoints <- subset(
+              station,
+              week == week_number &
+              year == year_number
+            )
+            
+            ##Check day constraint
+            out <- ifelse(
+              nrow(datapoints) < min_week, 
+              NA,
+              mean(datapoints$value)
+            )
+            
+            #Format the output
+            datapoints <- datapoints[1, , drop = FALSE]
+            datapoints$value <- out
+            
+            return(datapoints)
+          }
+        )
+        
+        #Join the weeks 
+        station_week <- do.call(rbind, station_week)
+        station_week <- na.omit(station_week)
+        
+        return(station_week)
+      }
+    )
+    
+    #Join the years 
+    station_year <- do.call(rbind, station_year)
+    station_year <- na.omit(station_year)
+    
+  }
+)
+
+
+
+
 

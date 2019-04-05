@@ -12,3 +12,8 @@ For each contaminant, summary de data points according to the following criteari
 Actually, we are only going to get week basis data. After, kriging-week data will be summarized!!!
 
 Week data will be considered by dividing days by 7. It will start from year-01-01 and labelling it according to the consecutive week number.
+
+## Example data output
+            date station_code pollutant unit    value week year
+1     2009-01-01          LAG        CO  ppm 2.017121    1 2009
+1869  2009-01-07          LAG        CO  ppm 2.039000    2 2009

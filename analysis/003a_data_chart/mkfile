@@ -1,12 +1,12 @@
 <config.mk
 
-#Obtain the summarized data by week, for each contaminant under each station
-results/%.RData: data/%.RData
+#Obtain the data_chart by week, for each contaminant under each station
+results/%.pdf: data/%.RData
 	set -x
 	mkdir -p `dirname $target`
- 	Rscript bin/summary.R \
+ 	Rscript bin/data_chart.R \
 		--file $prereq \
-		--out $target".build" \
+		--out $target".build.pdf" \
 		--cores $NT \
-	&& mv $target".build" $target
+	&& mv $target".build.pdf" $target
 

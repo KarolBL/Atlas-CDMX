@@ -3,4 +3,5 @@ find -L data \
        -type f \
        -name "*.RData" \
 | sed -r \
-	-e "s#^data#results#g"
+	-e "s#^data#results#g" \
+	-e "s#\.RData#\.pdf#g"

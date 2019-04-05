@@ -9,4 +9,4 @@ For each contaminant, summary de data points according to the following criteari
 5.- Average semester if more than 135 days (75%).
 6.- Average year if more than 273.75 days (75%).
 
-
+Actually, we are only going to get week basis data. After, kriging-week data will be summarized!!!

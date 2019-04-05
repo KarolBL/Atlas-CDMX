@@ -10,3 +10,5 @@ For each contaminant, summary de data points according to the following criteari
 6.- Average year if more than 273.75 days (75%).
 
 Actually, we are only going to get week basis data. After, kriging-week data will be summarized!!!
+
+Week data will be considered by dividing days by 7. It will start from year-01-01 and labelling it according to the consecutive week number.

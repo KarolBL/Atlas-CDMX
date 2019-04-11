@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 ############################################################
-## Goal: Summary the data using a 75% criteria
+## Goal: Measure the data missingness 
 ############################################################
 library("aire.zmvm")
 library("optparse")
@@ -41,19 +41,25 @@ if(is.null(opt$file)){
 }
 ############################################################
 # Debuging
-# opt$file <- "../data/TMP.RData"
-# opt$out <- "../results/TMP.RData"
+# opt$file <- "../data/O3.RData"
+# opt$out <- "../results/O3.RData"
 options(mc.cores = opt$cores)
 ############################################################
-#Filtering criteria
-# 1.- Average day if more than 18 hours (75%).
-min_hours <- 1 #17 # To consider 18 data points
-# 2.- Average week if more than 5.25 days (75%).
-min_week <- 1 #4   # To consider 5 data points
-# 3.- Average month if more than 22 days (75%).
-# 4.- Average trimester if more than 67.5 days (75%).
-# 5.- Average semester if more than 135 days (75%).
-# 6.- Average year if more than 273.75 days (75%).
+# For each contaminant, summary de data points available to 
+# establish data missingness, on a week basis. Moreover, the
+# data content will be scaled according to the theorical 
+# total, e. g.,
+# 
+# ```
+# Day 1 , 3 hours only  
+# Day 2 , 2 hours only
+# ------------
+# This week = 5 data points / (24 hours times seven days) * 100%
+# ```
+# 
+# Week data will be considered by dividing days by 7. It will
+# start from year-01-01 and labelling it according to the
+# consecutive week number.
 ############################################################
 #Load the contaminant data.frame object
 load(opt$file)
@@ -94,9 +100,9 @@ contaminant_day <- lapply(
         
         ##Check day constraint
         out <- ifelse(
-          nrow(datapoints) < min_hours, 
+          nrow(datapoints) == 0, 
           NA,
-          mean(datapoints$value)
+          length(datapoints$value)
         )
         
         #Format output
@@ -153,9 +159,9 @@ contaminant_week <- lapply(
             
             ##Check day constraint
             out <- ifelse(
-              nrow(datapoints) < min_week, 
+              nrow(datapoints) == 0 , 
               NA,
-              mean(datapoints$value)
+              sum(datapoints$value)
             )
             
             #Format the output
@@ -182,7 +188,7 @@ contaminant_week <- lapply(
   }
 )
 
-##Join contaminat summarized by week
+##Join contaminat missingness by week
 contaminant_week <- do.call(rbind, contaminant_week)
 contaminant_week <- na.omit(contaminant_week)
 contaminant <- contaminant_week

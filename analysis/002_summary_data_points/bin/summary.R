@@ -47,9 +47,9 @@ options(mc.cores = opt$cores)
 ############################################################
 #Filtering criteria
 # 1.- Average day if more than 18 hours (75%).
-min_hours <- 17 # To consider 18 data points
+min_hours <- 1 #17 # To consider 18 data points
 # 2.- Average week if more than 5.25 days (75%).
-min_week <- 4   # To consider 5 data points
+min_week <- 1 #4   # To consider 5 data points
 # 3.- Average month if more than 22 days (75%).
 # 4.- Average trimester if more than 67.5 days (75%).
 # 5.- Average semester if more than 135 days (75%).

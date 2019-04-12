@@ -4,7 +4,7 @@
 results/%.RData: data/%.RData
 	set -x
 	mkdir -p `dirname $target`
- 	Rscript bin/summary.R \
+ 	Rscript bin/missing.R \
 		--file $prereq \
 		--out $target".build" \
 		--cores $NT \

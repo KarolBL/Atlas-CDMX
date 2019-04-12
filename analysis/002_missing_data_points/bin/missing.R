@@ -133,7 +133,9 @@ contaminant_week <- lapply(
         format = "%j"
       )
     )%/%7+1
-    station$week[station$week == 53] <- 52
+    
+    #Remove few points at week 53
+    station <- station[station$week != 53, ]
     
     #Get the year
     station$year <- as.integer(

@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 ###########################################################
 ## Required libraries
 ###########################################################
@@ -11,13 +12,51 @@ library("sf")
 library("rgdal") 
 library("viridis")
 library("rvest")
+library("optparse")
+library("parallel")
+############################################################
+option_list <- list(
+  make_option(
+    c("-f", "--file"), 
+    type = "character", 
+    default = NULL, 
+    help = "dataset file name", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-o", "--out"), 
+    type = "character", 
+    default = "out.RData", 
+    help = "output RData file name [default= %default]", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-c", "--cores"), 
+    type = "integer", 
+    default = "7", 
+    help = "number of cores to use [default= %default]", 
+    metavar = "integer"
+  )
+) 
+
+#Build the parse object
+opt_parser <- OptionParser(option_list = option_list)
+opt <- parse_args(opt_parser)
+
+##Check for parsing options
+if(is.null(opt$file)){
+  print_help(opt_parser)
+  stop("At least one argument must be supplied (input file).n", call.=FALSE)
+}
+############################################################
+# Debuging
+# opt$file <- "../data/Mortality_cdmx/mortality_general.csv"
+# opt$out <- "../results/mortality_general.RData"
+options(mc.cores = opt$cores)
+############################################################
+## Loading Mortality data
 ###########################################################
-## DATA
-###########################################################
-###########################################################
-# Loading Mortality data
-###########################################################
-mortality_rate <- read_csv("~/Dropbox/Atlas_Environmental_Health/Datos/Data/Mortality/mortality_general.csv")
+mortality_rate <- read_csv(opt$file)
 #head(mortality_rate)
 # A tibble: 2 x 5
 #CVE_MUN municipio_name `2000` `2001` `2002`
@@ -25,7 +64,7 @@ mortality_rate <- read_csv("~/Dropbox/Atlas_Environmental_Health/Datos/Data/Mort
 # 1 NA      Total             5.3    5.3    5.4
 #2 002     Azcapotzalco      5.9    6.2    6.1
 
-#Remove total mortality row
+##Remove total mortality row, AKA, first row
 mortality_rate <- mortality_rate[-1,]
 #head(mortality_rate)
 
@@ -33,8 +72,13 @@ mortality_rate %>%
   mutate(id = CVE_MUN) -> #Rename CVE_ENT to "id"  
   mortality_rate
 
-mortality_tibble <- gather(data = mortality_rate, key = Year, value = rate, `2000`:`2016`)
-
+##wide to long format  
+mortality_tibble <- gather(
+    data = mortality_rate, 
+    key = Year, 
+    value = rate, 
+    `2000`:`2016`
+)
 #head(mortality_tibble)
 ## A tibble: 6 x 5
 #  CVE_MUN municipio_name    id    Year   rate
@@ -45,11 +89,12 @@ mortality_tibble <- gather(data = mortality_rate, key = Year, value = rate, `200
 #[1] 272   5
 
 ###########################################################
-# Loading Polygons from shapefile
+## Loading Polygons from shapefile
 ###########################################################
 polygons <- readOGR(
-  dsn= '/home/kbaca/Dropbox/Atlas_Environmental_Health/Datos/Data/Shapefiles', 
-  layer = '09mun')
+  dsn = '../data/Shapefiles', 
+  layer = '09mun'
+)
 
 polygons_boroughs <- subset(polygons, CVE_ENT=="09")
 #1] 16615     7

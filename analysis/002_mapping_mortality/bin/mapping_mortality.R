@@ -93,12 +93,27 @@ mortality_tibble <- gather(
 ###########################################################
 polygons <- readOGR(
   dsn = '../data/Shapefiles', 
-  layer = '09mun'
+  layer = 'Colonias'
 )
+#option 1 doesnt work
+polygons <- readOGR(
+  dsn = '.', 
+  layer = 'Colonias'
+)
+#option 2
+library(raster)
+s <- shapefile("/home/cfresno/Dropbox/inmegen/DAtos/Karol/Atlas-CDMX/Data/Shapefiles/Colonias.shp")
+#option 3 reads file but without geometry
+library(sf) 
+polygons <- sf::st_read('.')
+#dim(polygons)
+#[1] 58227    10
 
-polygons_boroughs <- subset(polygons, CVE_ENT=="09")
-#1] 16615     7
 
+polygons_boroughs <- subset(polygons, ST_NAME == "DISTRITO FEDERAL")
+#dim(polygons_boroughs)
+#[1] 2097   10
+st_coordinates(polygons_boroughs)
 #class(polygons_boroughs)
 #[1] "SpatialPolygonsDataFrame"
 #attr(,"package")
@@ -109,16 +124,16 @@ polygons_boroughs <- subset(polygons, CVE_ENT=="09")
 #..@ data       :'data.frame':	16 obs. of  4 variables:
 
 #Convert to tibble
-polygons_boroughs_tibble <- as.tibble(polygons_boroughs)
+polygons_boroughs_tibble <- as_tibble(polygons_boroughs)
 
-#head(polygons_boroughs)
-# A tibble: 6 x 4
-#  CVEGEO CVE_ENT CVE_MUN NOMGEO               
-#  <fct>  <fct>   <fct>   <fct>                
-#1 09002  09      002     Azcapotzalco         
-#2 09003  09      003     Coyoacán 
-#dim(polygons_boroughs)
-#[1] 16  4
+#head(polygons_boroughs_tibble)
+# A tibble: 6 x 10
+#OBJECTID POSTALCODE ST_NAME MUN_NAME SETT_NAME SETT_TYPE   AREA Shape_Leng Shape_Area
+#<int> <fct>      <fct>   <fct>    <fct>     <fct>      <dbl>      <dbl>      <dbl>
+#1    11065 01000      DISTRI… ÁLVARO … SAN ANGEL COLONIA   7.12e8     0.0539  0.0000947
+#2    11066 01010      DISTRI… ÁLVARO … LOS ALPES COLONIA   7.12e8     0.0299  0.0000443
+#3    11067 01020      DISTRI… ÁLVARO … GUADALUP… COLONIA   7.12e8     0.0342  0.0000576
+
 
 
 ###########################################################
@@ -126,8 +141,8 @@ polygons_boroughs_tibble <- as.tibble(polygons_boroughs)
 ###########################################################
 # Preliminar plots - polygons
 ggplot() +  
-  geom_polygon(data = polygons_boroughs, 
-               aes(x=long, y=lat, group=group), 
+  geom_polygon(data = polygons, 
+               aes_string(x = "lon", y = "lat"), 
                fill="white", color="black")
 
 ###########################################################

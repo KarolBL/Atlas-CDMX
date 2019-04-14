@@ -1,6 +1,8 @@
 #!/bin/bash
-find -L data \
+find -L data/Mortality_cdmx \
        -type f \
-       -name "*.RData" \
+       -name "*.csv" \
 | sed -r \
-	-e "s#^data#results#g"
+	-e "s#^data/Mortality_cdmx#results#g" \
+	-e "s#csv#RData#g"
+

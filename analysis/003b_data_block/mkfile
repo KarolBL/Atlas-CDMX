@@ -1,0 +1,12 @@
+<config.mk
+
+#Obtain the data_chart by week, for each contaminant under each station
+results/%.pdf: data/%.RData
+	set -x
+	mkdir -p `dirname $target`
+ 	Rscript bin/data_chart.R \
+		--file $prereq \
+		--out $target".build.pdf" \
+		--cores $NT \
+	&& mv $target".build.pdf" $target
+

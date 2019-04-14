@@ -6,6 +6,7 @@ results/%.RData: data/%.csv
 	mkdir -p `dirname $target`
  	Rscript bin/variograms.R \
 		--file $prereq \
+		--centroid data/Centroids/borough_centroid_coord.csv \
 		--out $target".build" \
 		--cores $NT \
 	&& mv $target".build" $target

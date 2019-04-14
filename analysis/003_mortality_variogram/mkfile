@@ -1,10 +1,10 @@
 <config.mk
 
-#Obtain the summarized data by week, for each contaminant under each station
-results/%.RData: data/%.RData
+#Obtain the empirical variograms and tested variogram model fit
+results/%.RData: data/%.csv
 	set -x
 	mkdir -p `dirname $target`
- 	Rscript bin/missing.R \
+ 	Rscript bin/variograms.R \
 		--file $prereq \
 		--out $target".build" \
 		--cores $NT \

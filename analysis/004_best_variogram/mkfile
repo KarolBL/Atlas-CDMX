@@ -1,0 +1,12 @@
+<config.mk
+
+# Obtain the best variogram model
+results/%.RData: data/%.RData
+	set -x
+	mkdir -p `dirname $target`
+ 	Rscript bin/best_variogram.R \
+		--file $prereq \
+		--out $target".build" \
+		--cores $NT \
+	&& mv $target".build" $target
+

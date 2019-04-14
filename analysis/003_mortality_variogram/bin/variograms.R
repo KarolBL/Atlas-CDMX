@@ -19,7 +19,7 @@ option_list <- list(
     metavar = "character"
   ),
   make_option(
-    c("-c", "--centroid"), 
+    c("-e", "--centroid"), 
     type = "character", 
     default = NULL, 
     help = "dataset file name", 
@@ -52,7 +52,7 @@ if(is.null(opt$file)){
 }
 ############################################################
 # Debuging
-# opt$file <- "../data/Mortality_cdmx/mortality_general.csv"
+# opt$file <- "../data/Mortality_cdmx/mortality_post_productive.csv"
 # opt$centroid <- "../data/Centroids/borough_centroid_coord.csv"
 # opt$out <- "../results/mortality_general.RData"
 # opt$cores <- 3
@@ -63,14 +63,14 @@ options(width = 150)
 mortality <- read.csv(opt$file)
 # Remove first, line  
 mortality <- mortality[-1, ]   
-head(mortality, 2)
+#head(mortality, 2)
 #   CVE_MUN municipio_name X2000 X2001 X2002 X2003 X2004 X2005 X2006 X2007 X2008 X2009 X2010 X2011 X2012 X2013 X2014 X2015 X2016
 # 2       2   Azcapotzalco   5.9   6.2   6.1   6.5   6.6   6.9   6.6   7.0   7.1   7.3   7.7   7.6   7.7   7.8     8   7.9   8.9
 # 3       3       Coyoacán   4.9   5.2   5.2   5.2   5.6   5.5   5.6   6.2   6.0   6.4   6.6   6.6   6.6   6.8     7   7.0   7.3
 
 ##Read Centroids
 borough <- read.csv(opt$centroid)
-head(borough,2)
+#head(borough,2)
 #         lon      lat CVE_MUN       NOMGEO
 # 1 -99.18211 19.48533       2 Azcapotzalco
 # 2 -99.15038 19.32667       3  Coyoac\xe1n
@@ -92,7 +92,7 @@ mortality_stfdf <- STFDF(
   sp = centroids,
   time = as.Date(paste(2000:2016, "-01-01", sep = "")),
   data = melt(
-    mortality[, -(1:2)]
+    mortality[, names(mortality) %in% paste("X", 2000:2016, sep = "")]
   )[, -1, drop = FALSE]
 )
 
@@ -419,7 +419,7 @@ vgmST2Try <- generate_vgmST_complete(
 fittedSTVariograms <- fit_Variogram_ST(
   sample_vgmST, 
   vgmST2Try, 
-  verbose = FALSE
+  verbose = TRUE
 )
                                        
 save(

@@ -385,11 +385,11 @@ fit_Variogram_ST <- function(
         method = "L-BFGS-B",
         lower = c(0.001,0.001,0.001,0.001,0.001)
       )
-      save(
-        out,
-        file = paste("model_", model, ".RData", sep = ""),
-        compress = "xz"
-      )
+#       save(
+#         out,
+#         file = paste("model_", model, ".RData", sep = ""),
+#         compress = "xz"
+#       )
       return(out)
     }
     )

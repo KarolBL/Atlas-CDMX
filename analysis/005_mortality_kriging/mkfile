@@ -1,0 +1,12 @@
+<config.mk
+
+# Obtain the kriged new data
+results/%.RData: data/%.RData
+	set -x
+	mkdir -p `dirname $target`
+ 	Rscript bin/kriging.R \
+		--file $prereq \
+		--out $target".build" \
+		--cores $NT \
+	&& mv $target".build" $target
+

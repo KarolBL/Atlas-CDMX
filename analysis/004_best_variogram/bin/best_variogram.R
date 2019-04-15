@@ -121,6 +121,7 @@ best_vgmSTs <- function(fittedSTVariograms){
 ############################################################################
 #Running the code
 ############################################################################
+#vgm_initial
 vgm_table <- create_RMSE_table(fittedSTVariograms)
 #do.call(rbind, vgm_table)
 

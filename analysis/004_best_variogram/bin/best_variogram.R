@@ -122,7 +122,7 @@ best_vgmSTs <- function(fittedSTVariograms){
 #Running the code
 ############################################################################
 vgm_table <- create_RMSE_table(fittedSTVariograms)
-do.call(rbind, vgm_table)
+#do.call(rbind, vgm_table)
 
 #Winner covariance structure
 winner <- best_vgmSTs(fittedSTVariograms)
@@ -133,8 +133,6 @@ winner <- best_vgmSTs(fittedSTVariograms)
 best <- best_vgmST_model(fittedSTVariograms)
 #        rmse covariance join space time
 # 1 0.3172613  sumMetric  Nug   Sph  Gau
-
-best_model <- fittedSTVariograms[[as.character(best_vgmST$covariance)]][[best_vgmST_models[as.character(best_vgmST$covariance)]]]
 
 #Get the best covariance model to use
 bestmodel2use <- fittedSTVariograms[[

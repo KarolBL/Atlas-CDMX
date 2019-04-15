@@ -1,11 +1,14 @@
 <config.mk
 
 # Obtain the kriged new data
-results/%.RData: data/%.RData
+results/%.RData: data/best_variogram/%.RData
 	set -x
 	mkdir -p `dirname $target`
  	Rscript bin/kriging.R \
-		--file $prereq \
+		--vgm $prereq \
+		--data data/Mortality_cdmx/mortality_general.csv \
+		--coordinates data/Centroids/neighborghood_centroid_coord.csv \
+		--centroid data/Centroids/borough_centroid_coord.csv \
 		--out $target".build" \
 		--cores $NT \
 	&& mv $target".build" $target

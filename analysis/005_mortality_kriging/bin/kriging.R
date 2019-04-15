@@ -33,6 +33,13 @@ option_list <- list(
     metavar = "character"
   ),
   make_option(
+    c("-e", "--centroid"), 
+    type = "character", 
+    default = NULL, 
+    help = "dataset file name", 
+    metavar = "character"
+  ),
+  make_option(
     c("-o", "--out"), 
     type = "character", 
     default = "out.RData", 
@@ -62,6 +69,7 @@ if(is.null(opt$file)){
 # opt$vgm  <- "../data/best_variogram/mortality_general.RData"
 # opt$data <- "../data/Mortality_cdmx/mortality_general.csv"
 # opt$coordinates <- "../data/Centroids/neighborghood_centroid_coord.csv"
+# opt$centroid <- "../data/Centroids/borough_centroid_coord.csv"
 # opt$out <- "../results/mortality_general.RData"
 # opt$cores <- 3
 options(mc.cores = opt$cores)
@@ -75,20 +83,66 @@ mortality <- mortality[-1,]
 
 #Coordinates
 neighborghood <- read.csv(opt$coordinates)
+borough <- read.csv(opt$centroid)
 
 #bestmodel2use
 load(opt$vgm)
-# attr(bestmodel2use, "spatial unit") <- ""
+attr(bestmodel2use, "spatial unit") <- ""
 
 ############################################################
 #Format Data for Kriging 
 
+##Original data
+# Create the SP object of the original data
+centroids <- borough[, c("CVE_MUN", "lon", "lat")]
+row.names(centroids) <- borough$NOMGEO
+#Transform into coordinates
+coordinates(centroids) <- ~ lon + lat
+centroids <- SpatialPoints(
+  centroids, 
+  proj4string = CRS("+proj=longlat +datum=WGS84")
+)
 
+# Create the STFDF object of the original data
+mortality_stfdf <- STFDF(
+  sp = centroids,
+  time = as.Date(paste(2000:2016, "-01-01", sep = "")),
+  data = melt(
+    mortality[, names(mortality) %in% paste("X", 2000:2016, sep = "")]
+  )[, -1, drop = FALSE]
+)
+
+#New data############################################################
+#Generate neighbourhood coordinates
+coordinates(neighborghood) <- ~ lon + lat
+neighborghood <- SpatialPoints(
+  neighborghood, 
+  proj4string = CRS("+proj=longlat +datum=WGS84")
+)
+
+#Finally the new data object
+new_data <- STF(
+  sp = neighborghood,
+  time = as.Date(paste(2000:2016, "-01-01", sep = ""))
+)
+
+#Finally the kriging
+kriged_data <- krigeST(
+  formula = value ~ 1,
+  data = mortality_stfdf,
+  #nmax = 100,
+  newdata = new_data,
+  modelList = bestmodel2use,
+  computeVar = TRUE,
+  progress = FALSE
+)
 
 ############################################################
-
-
-
+save(
+  kriged_data,
+  file = opt$out,
+  compress = "xz"
+)
 ############################################################################
 ## The end
 ############################################################################

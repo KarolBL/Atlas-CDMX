@@ -12,10 +12,24 @@ library("reshape2")
 ############################################################
 option_list <- list(
   make_option(
-    c("-f", "--file"), 
+    c("-v", "--vgm"), 
     type = "character", 
     default = NULL, 
-    help = "dataset file name", 
+    help = "variogram file name", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-d", "--data"), 
+    type = "character", 
+    default = NULL, 
+    help = "original data points for kriging data [default= %default]", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-e", "--coordinates"), 
+    type = "character", 
+    default = "coordinates.csv", 
+    help = "coordinates for kriging data [default= %default]", 
     metavar = "character"
   ),
   make_option(
@@ -45,23 +59,36 @@ if(is.null(opt$file)){
 }
 ############################################################
 # Debuging
-# opt$file <- "../data/mortality_general.RData"
+# opt$vgm  <- "../data/best_variogram/mortality_general.RData"
+# opt$data <- "../data/Mortality_cdmx/mortality_general.csv"
+# opt$coordinates <- "../data/Centroids/neighborghood_centroid_coord.csv"
 # opt$out <- "../results/mortality_general.RData"
 # opt$cores <- 3
 options(mc.cores = opt$cores)
 options(width = 150)
 ############################################################
 ## Read the data
-load(opt$file)
+#Mortality
+mortality <- read.csv(opt$data)
+#Remove total
+mortality <- mortality[-1,]
+
+#Coordinates
+neighborghood <- read.csv(opt$coordinates)
+
+#bestmodel2use
+load(opt$vgm)
+# attr(bestmodel2use, "spatial unit") <- ""
 
 ############################################################
-#Variogram models 
+#Format Data for Kriging 
+
+
+
 ############################################################
-#save(
-#  bestmodel2use, 
-#  file = opt$out,
-#  compress = "xz"
-#)
+
+
+
 ############################################################################
 ## The end
 ############################################################################

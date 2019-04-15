@@ -33,7 +33,7 @@ option_list <- list(
     metavar = "character"
   ),
   make_option(
-    c("-e", "--centroid"), 
+    c("-j", "--centroid"), 
     type = "character", 
     default = NULL, 
     help = "dataset file name", 
@@ -60,9 +60,9 @@ opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
 
 ##Check for parsing options
-if(is.null(opt$file)){
+if(is.null(opt$vgm)){
   print_help(opt_parser)
-  stop("At least one argument must be supplied (input file).n", call.=FALSE)
+  stop("At least one argument must be supplied (input vgm file).n", call.=FALSE)
 }
 ############################################################
 # Debuging

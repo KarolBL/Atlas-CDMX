@@ -1,0 +1,2 @@
+"","rmse","covariance","join","space","time"
+"1",81.3590340343505,"sumMetric","Nug","Sph","Gau"

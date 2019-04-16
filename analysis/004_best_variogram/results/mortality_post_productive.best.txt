@@ -1,0 +1,2 @@
+"","rmse","covariance","join","space","time"
+"1",16.3774229941989,"simpleSumMetric","Gau",NA,NA

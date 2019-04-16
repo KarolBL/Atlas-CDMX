@@ -1,16 +1,11 @@
 <config.mk
 
-# Obtain the best variogram model
-results/%.RData: data/%.RData
+# Obtain the centroid coordinates
+results/%.RData: data/%
 	set -x
 	mkdir -p `dirname $target`
- 	Rscript bin/best_variogram.R \
-		--file $prereq \
-		--initial "results/"$stem".initial.txt" \
-		--rmse "results/"$stem".rsme.txt" \
-		--winner "results/"$stem".winner.txt" \
-		--best "results/"$stem".best.txt" \
-		--pdf "results/"$stem".pdf" \
+ 	Rscript bin/centroids_neighborhood_level.R \
+		--directory $prereq \
 		--out $target".build" \
 		--cores $NT \
 	&& mv $target".build" $target

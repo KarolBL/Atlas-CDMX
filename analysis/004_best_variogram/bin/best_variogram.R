@@ -9,6 +9,7 @@ library("sp")
 library("spacetime")
 library("gtools")
 library("reshape2")
+library("xtable")
 ############################################################
 option_list <- list(
   make_option(
@@ -23,6 +24,41 @@ option_list <- list(
     type = "character", 
     default = "out.RData", 
     help = "output RData file name [default= %default]", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-i", "--initial"), 
+    type = "character", 
+    default = NULL, 
+    help = "output initial csv file name [default= %default]", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-r", "--rmse"), 
+    type = "character", 
+    default = NULL, 
+    help = "output rsme file name [default= %default]", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-w", "--winner"), 
+    type = "character", 
+    default = NULL, 
+    help = "output winner file name [default= %default]", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-b", "--best"), 
+    type = "character", 
+    default = NULL, 
+    help = "output best vgmST file name [default= %default]", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-p", "--pdf"), 
+    type = "character", 
+    default = NULL, 
+    help = "output variogram pdf file name [default= %default]", 
     metavar = "character"
   ),
   make_option(
@@ -47,6 +83,11 @@ if(is.null(opt$file)){
 # Debuging
 # opt$file <- "../data/mortality_general.RData"
 # opt$out <- "../results/mortality_general.RData"
+# opt$initial <- "../results/mortality_general.initial.txt"
+# opt$rmse <- "../results/mortality_general.rsme.txt"
+# opt$winner <- "../results/mortality_general.winner.txt"
+# opt$best <- "../results/mortality_general.best.txt"
+# opt$pdf <- "../results/mortality_general.pdf"
 # opt$cores <- 3
 options(mc.cores = opt$cores)
 options(width = 150)
@@ -122,11 +163,41 @@ best_vgmSTs <- function(fittedSTVariograms){
 #Running the code
 ############################################################################
 #vgm_initial
+initial_vgm <- print(xtable(do.call(rbind, vgm_initial)))
+write(initial_vgm, file = opt$initial)
+
+#vgm RMSE table
 vgm_table <- create_RMSE_table(fittedSTVariograms)
-#do.call(rbind, vgm_table)
+vgm_table <- rbind(
+  metric =c(vgm_table$metric, rep(NA_real_, 9-3)),
+  do.call(rbind, vgm_table[c("separable", "productSum")]),
+  matrix(
+    vgm_table$sumMetric, 
+    nrow = 3, 
+    ncol = 9, 
+    byrow = TRUE,
+    dimnames = list(
+      c("Exp", "Gau", "Sph"),
+      NULL
+    )
+  ),
+  matrix(
+    vgm_table$simpleSumMetric, 
+    nrow = 3, 
+    ncol = 9, 
+    byrow = TRUE,
+    dimnames = list(
+      c("Exp", "Gau", "Sph"),
+      NULL
+    )
+  )
+)
+vgm_table <- print(xtable(vgm_table))
+write(vgm_table, file = opt$rmse)
 
 #Winner covariance structure
 winner <- best_vgmSTs(fittedSTVariograms)
+write.csv(winner, file = opt$winner)
 # metric       separable      productSum       sumMetric simpleSumMetric 
 # 2               3               2              15               3 
 
@@ -134,6 +205,7 @@ winner <- best_vgmSTs(fittedSTVariograms)
 best <- best_vgmST_model(fittedSTVariograms)
 #        rmse covariance join space time
 # 1 0.3172613  sumMetric  Nug   Sph  Gau
+write.csv(best, file = opt$best)
 
 #Get the best covariance model to use
 bestmodel2use <- fittedSTVariograms[[
@@ -142,6 +214,24 @@ bestmodel2use <- fittedSTVariograms[[
   winner[as.character(best$covariance)]
 ]]
 #attr(bestmodel2use, "spatial unit") <- ""
+
+#Plotting the variograms
+pdf(
+    file = opt$pdf,
+    width = 7, height = 10
+)  
+plot(
+  sample_vgmST, 
+  list(
+    fittedSTVariograms$metric[[winner["metric"]]],
+    fittedSTVariograms$separable[[winner["separable"]]],
+    fittedSTVariograms$productSum[[winner["productSum"]]],
+    fittedSTVariograms$sumMetric[[winner["sumMetric"]]],
+    fittedSTVariograms$simpleSumMetric[[winner["simpleSumMetric"]]] 
+  ),
+  all = TRUE
+)
+dev.off()
 
 save(
   bestmodel2use, 

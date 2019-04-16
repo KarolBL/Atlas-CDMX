@@ -2,23 +2,23 @@
 # Make grid to interpolate values
 #############################################
 # Load packages
-install.packages("rgdal", "rgeos", "sp", "sf", "geosphere", "raster")
-library(sf)
-library(rgeos)
-library(raster)
-library(geosphere)
-library(sp)
-library(rgdal)
-library(leaflet)
-library(mapview)
-library(ggplot2)
+#install.packages("rgdal", "rgeos", "sp", "sf", "geosphere", "raster")
+library("sf")
+library("rgeos")
+library("raster")
+library("geosphere")
+library("sp")
+library("rgdal")
+library("leaflet")
+library("mapview")
+library("ggplot2")
 #############################################
 # Upload polygons at neighborghood level
 #############################################
 ## read polygon
-pol <- readOGR(".", 
-                      "Colonias"
-)
+#
+setwd("~/Dropbox/inmegen/DAtos/Karol/Atlas-CDMX/Data/Shapefiles/Colonias")
+pol <- readOGR(".")
 pol <- subset(pol, ST_NAME=="DISTRITO FEDERAL")
 
 #############################################
@@ -77,27 +77,36 @@ pol@data <- cbind(pol@data,
 )
 
 # Plot map at neighborghood level
-ggplot(pol) +
-  geom_polygon(data=pol,
-               aes(x = long,
-                   y = lat,
-                   group = group
-               ), 
-               fill = "#F17521",
-               color = "#1F77B4",
-               alpha = .6) +
-  geom_point(data = pol@data,
-             aes(x = x, 
-                 y = y)
-             ) 
+p <- ggplot(pol) +
+  geom_polygon(
+    data=pol,
+    aes(
+      x = long,
+      y = lat,
+      group = group
+    ), 
+    fill = "#F17521",
+    color = "#1F77B4",
+    alpha = .6
+  ) +
+  geom_point(
+    data = pol@data,
+    aes(
+      x = x,
+      y = y
+    )
+  )
+p
 
 #############################################
 # Create dataframe with Centrois and codes
 #############################################
-df <- data.frame("lon" = pol@data$x,
-                 "lat" = pol@data$y,
-                 "MUN_NAME" = pol@data$MUN_NAME,
-                 "SETT_NAME" = pol@data$SETT_NAME
-                 )
+df <- data.frame(
+  "lon" = pol@data$x,
+  "lat" = pol@data$y,
+  "MUN_NAME" = pol@data$MUN_NAME,
+  "SETT_NAME" = pol@data$SETT_NAME
+)
 
 write.csv(df, file = "neighborghood_centroid_coord.csv", row.names = FALSE)
+

@@ -164,36 +164,27 @@ join_neigh <-lapply(
 #Join the boroughs polygons 
 boroughs <- do.call(
   rbind,
-    lapply(
-      1:length(join_neigh), 
-      function(id){
-        SpatialPolygonsDataFrame(
-          join_neigh[[id]], 
-          data.frame(
-            ID = id,
-            MUN_NAME = boroughs[id]
-          )
+  lapply(
+    1:length(join_neigh), 
+    function(id){
+      SpatialPolygonsDataFrame(
+        join_neigh[[id]], 
+        data.frame(
+          ID = id,
+          MUN_NAME = boroughs[id]
         )
-      }
-    )
+      )
+    }
+  )
 )
 
-plot(boroughs)
-
-
-aux <- SpatialPointsDataFrame(coordinates(pol), tlalpan@data[1,,drop=FALSE])
-plot(aux)
-
-class(tlalpan)
-class(pol)
-SpatialPolygons
-SpatialPolygonsDataFrame
-?SpatialPolygonsDataFrame
-aa <- SpatialPolygonsDataFrame(pol, data.frame(test=1, id=1))
-plot(aa)
-gCentroidWithin(aa)
-points(coordinates(aa))
-
+#############################################
+# Add centroid coordinates to polygon dataset
+#############################################
+boroughs@data <- cbind(
+  boroughs@data,
+  gCentroidWithin(boroughs) %>% coordinates()
+)
 
 #create a data.frame from our spatial object
 pol2 <- fortify(pol, region = "OBJECTID")

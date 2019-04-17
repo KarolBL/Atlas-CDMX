@@ -1,5 +1,6 @@
+#!/usr/bin/env Rscript
 #############################################
-# Make grid to interpolate values
+# Required libraries
 #############################################
 # Load packages
 #install.packages("rgdal", "rgeos", "sp", "sf", "geosphere", "raster")
@@ -12,16 +13,66 @@ library("rgdal")
 library("leaflet")
 library("mapview")
 library("ggplot2")
+library("optparse")
+library("parallel")
 # http://mazamascience.com/WorkingWithData/?p=1494
+# Make grid to interpolate values
 #############################################
-# Upload polygons at neighborghood level
-#############################################
-## read polygon
-#
-setwd("~/Dropbox/inmegen/DAtos/Karol/Atlas-CDMX/Data/Shapefiles/Colonias")
-pol <- readOGR(".")
-pol <- subset(pol, ST_NAME=="DISTRITO FEDERAL")
+option_list <- list(
+  make_option(
+    c("-d", "--directory"), 
+    type = "character", 
+    default = NULL, 
+    help = "shapefile directory name", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-r", "--coordn"), 
+    type = "character", 
+    default = NULL, 
+    help = "neighborghood coordinates output file", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-o", "--out"), 
+    type = "character", 
+    default = "out.RData", 
+    help = "output RData file name [default= %default]", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-c", "--cores"), 
+    type = "integer", 
+    default = "7", 
+    help = "number of cores to use [default= %default]", 
+    metavar = "integer"
+  )
+) 
 
+#Build the parse object
+opt_parser <- OptionParser(option_list = option_list)
+opt <- parse_args(opt_parser)
+
+##Check for parsing options
+if(is.null(opt$directory)){
+  print_help(opt_parser)
+  stop("At least one argument must be supplied (input directory).n", call.=FALSE)
+}
+############################################################
+# Debuging
+# opt$directory <- "../data/Colonias"
+# opt$coordn <- "../results/neighborghood_centroid_coord.csv"
+# opt$out <- "../results/Colonia.RData"
+options(mc.cores = opt$cores)
+############################################################
+## Loading Shapefiles at neighborghood level
+###########################################################
+neighborghood <- readOGR(opt$directory)
+#Select on DF polygons
+neighborghood <- subset(
+  neighborghood, 
+  ST_NAME == "DISTRITO FEDERAL"
+)
 #############################################
 # Get centroids at neighborghood level
 #############################################
@@ -72,26 +123,63 @@ gCentroidWithin <- function(pol) {
 #############################################
 # Add centroid coordinates to polygon dataset
 #############################################
-pol@data <- cbind(pol@data,
+neighborghood@data <- cbind(neighborghood@data,
                    gCentroidWithin(
-                     pol
+                     neighborghood
                    ) %>% 
                      coordinates()
 )
 
 #############################################
-pol@data$fill <- 1:nrow(pol@data)
+# Create dataframe with Centrois and codes
+#############################################
+df <- data.frame(
+  "lon" = neighborghood@data$x,
+  "lat" = neighborghood@data$y,
+  "MUN_NAME" = neighborghood@data$MUN_NAME,
+  "SETT_NAME" = neighborghood@data$SETT_NAME
+)
 
-tlalpan <- subset(pol, MUN_NAME == "TLALPAN")
-pol <- tlalpan
-pol <- gUnaryUnion(pol)
+write.csv(df, file = opt$coordn, row.names = FALSE)
 
-coordinates(gCentroid(pol))
+#############################################
+# Join neighborghoods to create area matching
+# boroughs
+#############################################
+#Get the MUN_NAME
+boroughs <- as.character(unique(neighborghood@data$MUN_NAME))
 
-plot(pol)
-plot(tlalpan)
+#Get the neighborghood polygons of each borough
+join_neigh <-lapply(
+  boroughs,
+  function(borough){
+    datum <- subset(neighborghood,
+                    MUN_NAME == borough
+                    )
+    datum <- gUnaryUnion(datum) 
+    return(datum)
+    }
+)
 
-SpatialPointsDataFrame
+#Join the boroughs polygons 
+boroughs <- do.call(
+  rbind,
+    lapply(
+      1:length(join_neigh), 
+      function(id){
+        SpatialPolygonsDataFrame(
+          join_neigh[[id]], 
+          data.frame(
+            ID = id,
+            MUN_NAME = boroughs[id]
+          )
+        )
+      }
+    )
+)
+
+plot(boroughs)
+
 
 aux <- SpatialPointsDataFrame(coordinates(pol), tlalpan@data[1,,drop=FALSE])
 plot(aux)
@@ -140,15 +228,5 @@ p <- ggplot(
   )
 p
 
-#############################################
-# Create dataframe with Centrois and codes
-#############################################
-df <- data.frame(
-  "lon" = pol@data$x,
-  "lat" = pol@data$y,
-  "MUN_NAME" = pol@data$MUN_NAME,
-  "SETT_NAME" = pol@data$SETT_NAME
-)
 
-write.csv(df, file = "neighborghood_centroid_coord.csv", row.names = FALSE)
 

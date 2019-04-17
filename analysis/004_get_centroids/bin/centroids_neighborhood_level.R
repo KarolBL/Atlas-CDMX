@@ -13,6 +13,7 @@ library("rgdal")
 library("leaflet")
 library("mapview")
 library("ggplot2")
+library("ggspatial")
 library("optparse")
 library("parallel")
 # http://mazamascience.com/WorkingWithData/?p=1494
@@ -31,6 +32,13 @@ option_list <- list(
     type = "character", 
     default = NULL, 
     help = "neighborghood coordinates output file", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-p", "--pdf"), 
+    type = "character", 
+    default = NULL, 
+    help = "CDMX centroids graphical output file", 
     metavar = "character"
   ),
   make_option(
@@ -62,6 +70,7 @@ if(is.null(opt$directory)){
 # Debuging
 # opt$directory <- "../data/Colonias"
 # opt$coordn <- "../results/neighborghood_centroid_coord.csv"
+# opt$pdf <- "../results/CDMX_centroids.pdf"
 # opt$out <- "../results/Colonia.RData"
 options(mc.cores = opt$cores)
 ############################################################
@@ -186,21 +195,28 @@ boroughs@data <- cbind(
   gCentroidWithin(boroughs) %>% coordinates()
 )
 
+#############################################
 #create a data.frame from our spatial object
-pol2 <- fortify(pol, region = "OBJECTID")
+#############################################
+# neighborghood level
+df_neigh <- fortify(neighborghood, region = "OBJECTID")
 # merge the "fortified" data with the data from our spatial object
-pol2 <- merge(pol2, pol@data, by.y = "OBJECTID", by.x = "id")
+df_neigh <- merge(df_neigh, neighborghood@data, by.y = "OBJECTID", by.x = "id")
 
-#gUnion
+# borough level
+df_borough <- fortify(boroughs, region = "ID")
+df_borough <- merge(df_borough, boroughs@data, by.x = "id", by.y = "ID")
 
-# Plot map at neighborghood level
-p <- ggplot(
-  data = pol2,
+#############################################
+# Plot map at boroigh level
+#############################################
+p_boroughs <- ggplot(
+  #data = df_neigh,
+  data = df_borough,
   aes(
     x = long,
     y = lat,
-    group = id#,
-    #fill = MUN_NAME
+    group = id
   )
 ) +
   geom_polygon(
@@ -217,7 +233,69 @@ p <- ggplot(
     #title = element_blank()
     #axis.text = element_blank()
   )
-p
+#p_boroughs
 
+#############################################
+##Plot jointly borough + neighbourhood the graphs
+#############################################
+p_complete <- ggplot()+
+  geom_polygon(
+    data = df_neigh,
+    aes(
+      x = long,
+      y = lat,
+      group = id
+    ),
+    alpha = .6
+  ) +
+  geom_path(
+    data = df_neigh,
+    aes(
+      x = long,
+      y = lat,
+      group = group
+    ),
+    color = "white"
+  ) + 
+  geom_path(
+    data = df_borough,
+    aes(
+      x = long,
+      y = lat,
+      group = group
+    ),
+    color = "blue"
+  ) + 
+  geom_point(
+    data = boroughs@data,
+    aes(
+      x = x,
+      y = y
+    ),
+    color = "red"
+  ) + 
+  coord_equal() +
+  xlab("Longitude")+
+  ylab("Latitude")+
+  theme_bw()+
+  annotation_north_arrow(
+    location = "bl", 
+    which_north = "TRUE", 
+    pad_x = unit(0.3, "in"), 
+    pad_y = unit(0.4, "in"),
+    style = north_arrow_fancy_orienteering
+  )+
+  annotation_scale()+
+  coord_sf(crs = 4326)+
+  theme(
+    panel.grid = element_line(colour = "transparent")
+  )
+p_complete 
 
-
+ggsave(
+  p_complete,
+  file = opt$pdf,
+  width = 5,
+  height = 5,
+  device = cairo_pdf
+)

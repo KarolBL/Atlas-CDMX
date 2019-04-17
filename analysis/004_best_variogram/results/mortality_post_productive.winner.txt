@@ -1,0 +1,6 @@
+"","x"
+"metric",2
+"separable",2
+"productSum",2
+"sumMetric",15
+"simpleSumMetric",12

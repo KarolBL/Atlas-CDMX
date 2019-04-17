@@ -1,0 +1,16 @@
+% latex table generated in R 3.5.0 by xtable 1.8-3 package
+% Tue Apr 16 21:24:32 2019
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrr}
+  \hline
+ & t & s & join \\ 
+  \hline
+nugget & 9.03 & 10.58 & 9.81 \\ 
+  sill & 20.77 & 18.16 & 19.46 \\ 
+  range & 12.00 & 13.27 & 12.64 \\ 
+  stAni & 0.00 & 0.00 & 0.00 \\ 
+   \hline
+\end{tabular}
+\end{table}
+

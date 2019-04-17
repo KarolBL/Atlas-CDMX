@@ -70,6 +70,7 @@ mortality <- mortality[-1, ]
 
 ##Read Centroids
 borough <- read.csv(opt$centroid)
+borough$ID <- NULL
 #head(borough,2)
 #         lon      lat CVE_MUN       NOMGEO
 # 1 -99.18211 19.48533       2 Azcapotzalco

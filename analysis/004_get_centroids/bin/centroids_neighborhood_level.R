@@ -28,10 +28,17 @@ option_list <- list(
     metavar = "character"
   ),
   make_option(
-    c("-r", "--coordn"), 
+    c("-n", "--coordn"), 
     type = "character", 
     default = NULL, 
     help = "neighborghood coordinates output file", 
+    metavar = "character"
+  ),
+  make_option(
+    c("-b", "--coordb"), 
+    type = "character", 
+    default = NULL, 
+    help = "Borough coordinates output file", 
     metavar = "character"
   ),
   make_option(
@@ -70,6 +77,7 @@ if(is.null(opt$directory)){
 # Debuging
 # opt$directory <- "../data/Colonias"
 # opt$coordn <- "../results/neighborghood_centroid_coord.csv"
+# opt$coordb <- "../results/borough_centroid_coord.csv"
 # opt$pdf <- "../results/CDMX_centroids.pdf"
 # opt$out <- "../results/Colonia.RData"
 options(mc.cores = opt$cores)
@@ -148,9 +156,6 @@ df <- data.frame(
   "MUN_NAME" = neighborghood@data$MUN_NAME,
   "SETT_NAME" = neighborghood@data$SETT_NAME
 )
-
-write.csv(df, file = opt$coordn, row.names = FALSE)
-
 #############################################
 # Join neighborghoods to create area matching
 # boroughs
@@ -292,10 +297,39 @@ p_complete <- ggplot()+
   )
 p_complete 
 
+#############################################
+## Outputs
+#############################################
+##Just the complete borough + neighbourhood 
 ggsave(
   p_complete,
   file = opt$pdf,
   width = 5,
   height = 5,
   device = cairo_pdf
+)
+
+##Coordinates for neighbourhood kriging
+neighbourhood_coordinates <- df
+write.csv(
+  df, 
+  file = opt$coordn, 
+  row.names = FALSE
+)
+
+##Coordinates for borough data points
+borough_coordinates <- boroughs@data
+write.csv(
+  borough_coordinates, 
+  file = opt$coordb, 
+  row.names = FALSE
+)
+
+##RData for ploting purpouses
+save(
+  boroughs, neighborghood,
+  neighbourhood_coordinates, borough_coordinates,
+  df_borough, df_neigh,
+  file = opt$out, 
+  compress = "xz"
 )

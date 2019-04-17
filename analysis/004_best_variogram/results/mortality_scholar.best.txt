@@ -1,2 +1,0 @@
-"","rmse","covariance","join","space","time"
-"1",1.71266335907005e-06,"separable",NA,"Exp","Exp"

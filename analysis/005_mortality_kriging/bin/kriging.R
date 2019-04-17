@@ -120,10 +120,27 @@ neighborghood <- SpatialPoints(
   proj4string = CRS("+proj=longlat +datum=WGS84")
 )
 
+#Time period by trimesters 
+times <- as.Date(
+  do.call(
+    c,
+    lapply(
+      2000:2016, 
+      function(year){
+        paste(
+          year, 
+          c("-01-01", "-04-01", "-07-01", "-10-01"), 
+          sep = ""
+        )    
+      }
+    )
+  )
+)
+
 #Finally the new data object
 new_data <- STF(
   sp = neighborghood,
-  time = as.Date(paste(2000:2016, "-01-01", sep = ""))
+  time = times
 )
 
 #Finally the kriging

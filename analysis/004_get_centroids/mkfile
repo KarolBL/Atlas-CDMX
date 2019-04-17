@@ -6,6 +6,9 @@ results/%.RData: data/%
 	mkdir -p `dirname $target`
  	Rscript bin/centroids_neighborhood_level.R \
 		--directory $prereq \
+		--coordn results/neighborghood_centroid_coord.csv \
+		--coordb results/borough_centroid_coord.csv \
+		--pdf results/CDMX_centroids.pdf \
 		--out $target".build" \
 		--cores $NT \
 	&& mv $target".build" $target

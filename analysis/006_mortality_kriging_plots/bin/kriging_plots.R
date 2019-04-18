@@ -223,7 +223,12 @@ m_kriged_data <- melt(
 )
 m_kriged_data$level <- "Neighbourhood" 
 
-head(m_kriged_data)
+#Joining borough and neighbourhood data into a single object
+m_complete <- rbind(
+  m_kriged_data,
+  m_mortality
+)
+head(m_complete)
 ############################################################################
 ## The end
 ############################################################################

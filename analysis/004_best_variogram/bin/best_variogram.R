@@ -193,7 +193,7 @@ vgm_table <- rbind(
   )
 )
 
-vgm_table <- print(xtable(vgm_table, display = rep("E", ncol(vgm_table)+1)))
+vgm_table <- print(xtable(vgm_table, display = rep("E", ncol(vgm_table)+1), digits = 7))
 write(vgm_table, file = opt$rmse)
 
 #Winner covariance structure

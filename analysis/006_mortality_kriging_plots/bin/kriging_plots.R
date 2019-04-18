@@ -74,6 +74,7 @@ if(is.null(opt$colonia)){
 # opt$cores <- 3
 options(mc.cores = opt$cores)
 options(width = 100)
+options(max.print = 100)
 ############################################################
 ## Read the data
 ############################################################
@@ -139,12 +140,36 @@ mortality <- lapply(
   }
 )
 mortality <- do.call(rbind, mortality)
-m_mortality <- melt(
-  mortality,
-  id.vars = c("CVE_MUN", "Type"),
-  variable.name = "Year"
+#Same levels
+mortality$CVE_MUN <- droplevels(mortality$CVE_MUN)
+levels(mortality$CVE_MUN) <- c(
+  levels(borough_coordinates$MUN_NAME),
+  "ÁLVARO OBREGÓN",
+  "BENITO JUÁREZ",
+  "COYOACÁN",
+  "CUAUHTÉMOC",
+  "TLÁHUAC",
+  "GUSTAVO A MADERO"
 )
 
+#Adjust order with borough_coordinates
+mortality <- mortality[order(mortality$Type, as.numeric(mortality$CVE_MUN)),]
+
+#Adding aditional columns
+#lon      lat       MUN_NAME     SETT_NAME ID kriging_times      Type    value         level
+mortality$lon <- rep(borough_coordinates$x, length(unique(mortality$Type)))
+mortality$lat <- rep(borough_coordinates$y, length(unique(mortality$Type)))
+mortality$MUN_NAME <- mortality$CVE_MUN
+mortality$SETT_NAME <- mortality$CVE_MUN
+mortality$CVE_MUN <- NULL
+mortality$ID <- NA
+
+#Melting data
+m_mortality <- melt(
+  mortality,
+  id.vars = c("lon", "lat", "MUN_NAME", "SETT_NAME", "ID", "Type"),
+  variable.name = "Year"
+)
 #Modify the year
 m_mortality$Year <- substr(
   as.character(m_mortality$Year),
@@ -152,12 +177,20 @@ m_mortality$Year <- substr(
   stop = 5
 )
 m_mortality$Year <- as.integer(m_mortality$Year)
+m_mortality$level <- "Borough"
+m_mortality <- m_mortality[, c(1:5,7,6,8:9)]
+
+#Change year into date
+m_mortality$Year <- as.factor(m_mortality$Year)
+levels(m_mortality$Year) <- paste(2000:2016, "-01-01", sep = "")
+names(m_mortality)[6] <- "kriging_times"
+m_mortality$kriging_times <- as.Date(as.character(m_mortality$kriging_times))
 
 ############################################################
 ##Format kriged data to plot
 ############################################################
 #Time points
-times <- as.Date(row.names(as.data.frame(kriging$childhood@time)))
+kriging_times <- as.Date(row.names(as.data.frame(kriging$childhood@time)))
 #Coordinates
 kriging_coords <- as.data.frame(coordinates(kriging$childhood@sp))
 kriging_coords$kriged_index <- 1:nrow(kriging_coords)
@@ -167,7 +200,30 @@ kriging_coords <- kriging_coords[order(kriging_coords$kriged_index), ]
 stopifnot(all(kriging_coords$neigh_ID == kriging_coords$kriged_index)) #same oder
 kriging_coords$neigh_ID <- NULL
 kriging_coords$kriged_index <- NULL
+#Values
+kriging_values <- lapply(
+  age_mortality, 
+  function(type){
+      kriging[[type]]@data$var1.pred
+  }
+)
+kriging_values <- as.data.frame(do.call(cbind, kriging_values))
+names(kriging_values) <- age_mortality
+head(kriging_values)
+##Join the data
+kriged_data <- cbind(
+  kriging_coords,
+  kriging_times,
+  kriging_values
+)
+m_kriged_data <- melt(
+  kriged_data,
+  id.vars = c("lon", "lat", "MUN_NAME", "SETT_NAME", "ID", "kriging_times"),
+  variable.name = "Type"
+)
+m_kriged_data$level <- "Neighbourhood" 
 
+head(m_kriged_data)
 ############################################################################
 ## The end
 ############################################################################

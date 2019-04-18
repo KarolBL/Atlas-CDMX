@@ -34,6 +34,13 @@ option_list <- list(
     metavar = "character"
   ),
   make_option(
+    c("-m", "--kriging"), 
+    type = "character", 
+    default = NULL, 
+    help = "kriging directory data [default= %default]", 
+    metavar = "character"
+  ),
+  make_option(
     c("-o", "--out"), 
     type = "character", 
     default = "out.RData", 
@@ -54,21 +61,23 @@ opt_parser <- OptionParser(option_list = option_list)
 opt <- parse_args(opt_parser)
 
 ##Check for parsing options
-if(is.null(opt$vgm)){
+if(is.null(opt$colonia)){
   print_help(opt_parser)
   stop("At least one argument must be supplied (input vgm file).n", call.=FALSE)
 }
 ############################################################
 # Debuging
 # opt$colonia  <- "../data/Colonias.RData"
-# opt$mortality <- "../data/Mortality_cdmx"
-# opt$out <- "../results/mortality_general.RData"
+# opt$mortality <- "../data/Mortality_cdmx/"
+# opt$kriging <- "../data/Kriging/"
+# opt$out <- "../results/"
 # opt$cores <- 3
 options(mc.cores = opt$cores)
-options(width = 150)
+options(width = 100)
 ############################################################
 ## Read the data
-#Mortality unification
+############################################################
+## Mortality unification
 candidate_files <- list.files(
   opt$mortality, 
   ".csv",
@@ -77,91 +86,88 @@ candidate_files <- list.files(
 mortality <- lapply(
   candidate_files, 
   function(candidate){
-    datum <- read.csv(opt$colonia)
+    datum <- read.csv(candidate)
+    datum <- datum[-1,]
   }
 )
-#Remove total
-mortality <- mortality[-1,]
-
-#Coordinates
-neighborghood <- read.csv(opt$coordinates)
-borough <- read.csv(opt$centroid)
-
-#bestmodel2use
-load(opt$vgm)
-attr(bestmodel2use, "spatial unit") <- ""
-
-############################################################
-#Format Data for Kriging 
-
-##Original data
-# Create the SP object of the original data
-centroids <- borough[, c("CVE_MUN", "lon", "lat")]
-row.names(centroids) <- borough$NOMGEO
-#Transform into coordinates
-coordinates(centroids) <- ~ lon + lat
-centroids <- SpatialPoints(
-  centroids, 
-  proj4string = CRS("+proj=longlat +datum=WGS84")
-)
-
-# Create the STFDF object of the original data
-mortality_stfdf <- STFDF(
-  sp = centroids,
-  time = as.Date(paste(2000:2016, "-01-01", sep = "")),
-  data = melt(
-    mortality[, names(mortality) %in% paste("X", 2000:2016, sep = "")]
-  )[, -1, drop = FALSE]
-)
-
-#New data############################################################
-#Generate neighbourhood coordinates
-coordinates(neighborghood) <- ~ lon + lat
-neighborghood <- SpatialPoints(
-  neighborghood, 
-  proj4string = CRS("+proj=longlat +datum=WGS84")
-)
-
-#Time period by trimesters 
-times <- as.Date(
-  do.call(
-    c,
-    lapply(
-      2000:2016, 
-      function(year){
-        paste(
-          year, 
-          c("-01-01", "-04-01", "-07-01", "-10-01"), 
-          sep = ""
-        )    
-      }
+#Name the age specific mortality
+age_mortality <- do.call(
+    rbind, 
+    strsplit(
+      split = "mortality_",
+      candidate_files
     )
-  )
+  )[, 2]
+age_mortality <- gsub(
+  pattern = ".csv",
+  replacement = "",
+  age_mortality
+)
+names(mortality) <- age_mortality
+
+## Map coordinates
+load(opt$colonia)
+
+## Kriging data
+candidate_files <- list.files(
+  opt$kriging, 
+  ".RData",
+  full.names = TRUE
+)
+kriging <- lapply(
+  candidate_files, 
+  function(candidate){
+    load(candidate)
+    return(kriged_data)
+  }
+)
+names(kriging) <- age_mortality
+##Total neighbourhood 
+# t(t(table(as.character(neighborghood@data$MUN_NAME))))
+############################################################
+##Format mortality data to plot
+############################################################
+##mortality to ggplot format
+mortality[[2]]$CVE_MUN <- mortality[[2]]$municipio_name
+mortality[[2]]$municipio_name <- NULL
+mortality <- lapply(
+  age_mortality, 
+  function(type){
+    aux <- mortality[[type]]
+    aux$Type <- type
+    return(aux)
+  }
+)
+mortality <- do.call(rbind, mortality)
+m_mortality <- melt(
+  mortality,
+  id.vars = c("CVE_MUN", "Type"),
+  variable.name = "Year"
 )
 
-#Finally the new data object
-new_data <- STF(
-  sp = neighborghood,
-  time = times
+#Modify the year
+m_mortality$Year <- substr(
+  as.character(m_mortality$Year),
+  start = 2,
+  stop = 5
 )
-
-#Finally the kriging
-kriged_data <- krigeST(
-  formula = value ~ 1,
-  data = mortality_stfdf,
-  #nmax = 100,
-  newdata = new_data,
-  modelList = bestmodel2use,
-  computeVar = TRUE,
-  progress = FALSE
-)
+m_mortality$Year <- as.integer(m_mortality$Year)
 
 ############################################################
-save(
-  kriged_data,
-  file = opt$out,
-  compress = "xz"
-)
+##Format kriged data to plot
+############################################################
+#Time points
+times <- as.Date(row.names(as.data.frame(kriging$childhood@time)))
+#Coordinates
+kriging_coords <- as.data.frame(coordinates(kriging$childhood@sp))
+kriging_coords$kriged_index <- 1:nrow(kriging_coords)
+neighbourhood_coordinates$neigh_ID <- 1:nrow(neighbourhood_coordinates)
+kriging_coords <- merge(kriging_coords, neighbourhood_coordinates, by = c("lon", "lat"))
+kriging_coords <- kriging_coords[order(kriging_coords$kriged_index), ]
+stopifnot(all(kriging_coords$neigh_ID == kriging_coords$kriged_index)) #same oder
+kriging_coords$neigh_ID <- NULL
+kriging_coords$kriged_index <- NULL
+
 ############################################################################
 ## The end
 ############################################################################

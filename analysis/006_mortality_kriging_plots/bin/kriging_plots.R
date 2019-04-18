@@ -228,7 +228,99 @@ m_complete <- rbind(
   m_kriged_data,
   m_mortality
 )
-head(m_complete)
+levels(m_complete$Type) <- c(
+  "Infant",
+  "Global",
+  "Post-productive",
+  "Pre-school",
+  "Productive",
+  "School"
+)
+m_complete$Type <- factor(
+  as.character(m_complete$Type),
+  levels = c(
+    "Global",
+    "Post-productive",
+    "Productive",
+    "School",
+    "Pre-school",    
+    "Infant"
+  )
+)
+m_complete$Borough <- m_complete$MUN_NAME
+m_complete$MUN_NAME <- NULL
+
+############################################################################
+##Ploting data at last
+############################################################################
+##Time evolution
+#head(m_complete)
+p_time_raw <- ggplot(
+  data = subset(
+    m_complete,
+    level == "Borough" & Type == "Global"
+  ),
+  aes(
+    x = kriging_times,
+    y = value,
+    group = Borough,
+    colour = Borough
+  )
+)+
+  xlab("Year")+
+  ylab("Mortality rate [x1000]")+
+  geom_point()+
+  #geom_smooth(se = FALSE)+
+  geom_line(linetype = "dashed")+
+  facet_grid(Type ~ ., scales = "free_y")+
+  theme_bw()+
+  theme(
+    legend.position = "bottom"
+  )
+p_time_raw
+ggsave(
+  p_time_raw,
+  file = paste(opt$out, "Mortality_borough_crude.pdf"),
+  width = 10,
+  height = 8
+)
+write.csv(
+  m_complete,
+  row.names = FALSE,
+  quote = FALSE,
+  file = paste(opt$out, "Mortality_borough_crude.csv")
+)
+############################################################################
+## Using kriging data
+############################################################################
+p_neigh_time <- ggplot(
+  data = subset(
+    m_complete,
+    level == "Neighbourhood" & Type == "Global" & Borough == "TLALPAN" &
+      kriging_times %in% as.Date(
+       paste(2000:2016, "-01-01", sep = "")
+      ) &
+      SETT_NAME %in% unique(m_complete$SETT_NAME[m_complete$Borough == "TLALPAN"])[8:15]
+  ),
+  aes(
+    x = kriging_times,
+    y = value,
+    group = SETT_NAME,
+    colour = SETT_NAME
+  )
+)+
+  xlab("Year")+
+  ylab("Mortality rate [x1000]")+
+  geom_point()+
+  #geom_smooth(se = FALSE)+
+  geom_line(linetype = "dashed")+
+  #facet_grid(Type ~ ., scales = "free_y")+
+  theme_bw()+
+  theme(
+    legend.position = "none"
+  )
+p_neigh_time
+
 ############################################################################
 ## The end
 ############################################################################

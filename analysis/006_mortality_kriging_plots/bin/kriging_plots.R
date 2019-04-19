@@ -13,6 +13,8 @@ library("mapview")
 library("ggplot2")
 library("reshape2")
 library("cowplot")
+library("RColorBrewer")
+library("gridExtra")
 library("ggspatial")
 library("optparse")
 library("parallel")
@@ -194,6 +196,8 @@ kriging_times <- as.Date(row.names(as.data.frame(kriging$childhood@time)))
 #Coordinates
 kriging_coords <- as.data.frame(coordinates(kriging$childhood@sp))
 kriging_coords$kriged_index <- 1:nrow(kriging_coords)
+neighborghood$OBJECTID
+
 neighbourhood_coordinates$neigh_ID <- 1:nrow(neighbourhood_coordinates)
 kriging_coords <- merge(kriging_coords, neighbourhood_coordinates, by = c("lon", "lat"))
 kriging_coords <- kriging_coords[order(kriging_coords$kriged_index), ]
@@ -280,7 +284,13 @@ p_time_raw <- ggplot(
 p_time_raw
 ggsave(
   p_time_raw,
-  file = paste(opt$out, "Mortality_borough_crude.pdf"),
+  file = paste(opt$out, "Time_mortality_borough_crude.pdf"),
+  width = 10,
+  height = 8
+)
+ggsave(
+  p_time_raw,
+  file = paste(opt$out, "Time_mortality_borough_global_crude.pdf"),
   width = 10,
   height = 8
 )
@@ -321,6 +331,590 @@ p_neigh_time <- ggplot(
   )
 p_neigh_time
 
+#############################################
+# Plot map at borough level
+#############################################
+head(df_borough)
+add_mortality <- function(
+  df_borough, 
+  m_complete, 
+  time = as.Date(
+    paste(
+      seq(from = 2000, to = 2016, by = 5),
+      "-01-01", 
+      sep = ""
+    )
+  ),
+  type = levels(m_complete$Type),
+  Level = "Borough"
+){
+  #Copy original data
+  map <- df_borough
+  
+  #Select time + level + type level
+  kriged <- subset(
+    m_complete,
+    Type %in% type &
+      level %in% Level &
+      kriging_times %in% time
+  )
+  
+  mm <- merge(
+    map, 
+    kriged,
+    by.x = "MUN_NAME",
+    by.y = "Borough",
+    all.y = TRUE
+  )
+  return(mm)
+}
+
+mm <- add_mortality(df_borough, m_complete)
+mm$kriging_times <- format(mm$kriging_times, "%Y")
+
+p_kriged_time_borough <- ggplot(
+  data = mm,
+  aes(
+    x = long,
+    y = lat.x,
+    group = id,
+    fill = value
+  )
+) +
+  geom_polygon(
+    alpha = .6
+  ) +
+  geom_path(color = "white")+
+  #geom_point() + #los del polígono
+  facet_grid(Type ~ kriging_times)+
+  coord_equal() +
+  xlab("Longitude")+
+  ylab("Latitud")+
+  theme_bw()+
+  theme(
+    #legend.position = "left",
+    panel.grid = element_line(colour = "transparent")
+    #title = element_blank()
+    #axis.text = element_blank()
+  )+
+  scale_fill_gradientn(
+    #name = "Global mortality rate", 
+    name = "Rate",
+    colours = brewer.pal(9, name = "YlOrRd")
+  )
+p_kriged_time_borough
+
+##Global 
+p_global <- ggplot(
+  data = subset(
+    mm,
+    Type == "Global"
+  ),
+  aes(
+    x = long,
+    y = lat.x,
+    group = id,
+    fill = value
+  )
+) +
+  geom_polygon(
+    alpha = .6
+  ) +
+  geom_path(color = "white")+
+  #geom_point() + #los del polígono
+  facet_grid(Type ~ kriging_times)+
+  coord_equal() +
+  #xlab("Longitude")+
+  #ylab("Latitude")+
+  #ylab(" ")+
+  theme_bw()+
+  theme(
+    #legend.position = "left",
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_line(colour = "transparent")
+    #title = element_blank()
+    #axis.text = element_blank()
+  )+
+  scale_fill_gradientn(
+    #name = "Global mortality rate", 
+    name = "",
+    colours = brewer.pal(9, name = "YlOrRd")
+  )
+#p_global
+
+##Intermediate plots
+intermediate_plot <-function(mm, type){
+ ggplot(
+  data = subset(
+    mm,
+    Type == type
+  ),
+  aes(
+    x = long,
+    y = lat.x,
+    group = id,
+    fill = value
+  )
+) +
+  geom_polygon(
+    alpha = .6
+  ) +
+  geom_path(color = "white")+
+  #geom_point() + #los del polígono
+  facet_grid(Type ~ kriging_times)+
+  coord_equal() +
+  #xlab("Longitude")+
+  #ylab("Latitude")+
+  #ylab(" ")+
+  theme_bw()+
+  theme(
+    #legend.position = "left",
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_line(colour = "transparent")
+    #title = element_blank()
+    #axis.text = element_blank()
+  )+
+  scale_fill_gradientn(
+    #name = "Global mortality rate", 
+    name = "",
+    colours = brewer.pal(9, name = "YlOrRd")
+  )
+}
+p <- lapply(
+  levels(mm$Type)[-c(1,6)],
+  intermediate_plot, 
+  mm =mm
+)
+
+p_infant <- ggplot(
+  data = subset(
+    mm,
+    Type == "Global"
+  ),
+  aes(
+    x = long,
+    y = lat.x,
+    group = id,
+    fill = value
+  )
+) +
+  geom_polygon(
+    alpha = .6
+  ) +
+  geom_path(color = "white")+
+  #geom_point() + #los del polígono
+  facet_grid(Type ~ kriging_times)+
+  coord_equal() +
+  #xlab("Longitude")+
+  #ylab("Latitude")+
+  #ylab(" ")+
+  theme_bw()+
+  theme(
+    #legend.position = "left",
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_line(colour = "transparent")
+    #title = element_blank()
+    #axis.text = element_blank()
+  )+
+  scale_fill_gradientn(
+    #name = "Global mortality rate", 
+    name = "",
+    colours = brewer.pal(9, name = "YlOrRd")
+  )
+#p_infant
+
+
+#grid.arrange
+
+raw <- plot_grid(
+  plotlist = list(
+    p_global,
+    p[[1]],
+    p[[2]],
+    p[[3]],
+    p[[4]],
+    p_infant
+  ),
+  ncol = 1
+)
+raw
+ggsave(
+  raw,
+  file = paste(opt$out,"Space_mortality_borough_crude.pdf",sep=""),
+  width = 7,
+  height= 11
+)
+################################################################################
+## Neigbourhood level for 2000, 2005, 2010, 2015
+################################################################################
+#p_global
+mm <- add_mortality(df_borough, m_complete)
+mm$kriging_times <- format(mm$kriging_times, "%Y")
+mm <- subset(
+  mm,
+  Type == "Global"
+)
+mm$Type <- "Borough level"
+
+p_global <- ggplot(
+  data = mm,
+  aes(
+    x = long,
+    y = lat.x,
+    group = id,
+    fill = value
+  )
+) +
+  geom_polygon(
+    alpha = .6
+  ) +
+  geom_path(color = "white")+
+  #geom_point() + #los del polígono
+  facet_grid(Type ~ kriging_times)+
+  coord_equal() +
+  #xlab("Longitude")+
+  ylab("Latitude")+
+  #ylab(" ")+
+  theme_bw()+
+  theme(
+    #legend.position = "left",
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.title.x = element_blank(),
+    panel.grid = element_line(colour = "transparent")
+    #title = element_blank()
+    #axis.text = element_blank()
+  )+
+  scale_fill_gradientn(
+    name = "Rate", 
+    colours = brewer.pal(9, name = "YlOrRd")
+  )
+p_global
+
+add_kriging_data <- function(
+  df_neigh, 
+  m_complete, 
+  time = as.Date(
+    paste(
+      seq(from = 2000, to = 2016, by = 5),
+      "-01-01", 
+      sep = ""
+    )
+  )[1],
+  type = "Global",
+  Level = "Neighbourhood"
+){
+  #Copy original data
+  map <- df_neigh
+  
+  #Select time + level + type level
+  kriged <- subset(
+    m_complete,
+    Type %in% type &
+      level %in% Level &
+      kriging_times %in% time
+  )
+  head(kriged,2)
+  dim(kriged)
+  length(unique(df_neigh$SETT_NAME))
+  
+  
+  mm <- merge(
+    map, 
+    kriged,
+    by.x = "SETT_NAME",
+    by.y = "SETT_NAME",
+    all.x = TRUE,
+    all.y = FALSE
+  )
+  return(mm)
+}
+
+head(map, 2)
+head(kriged, 2)
+dim(map)
+dim(kriged)
+dim(mm)
+summary(mm$value)
+
+cua <- subset(
+  #df_neigh,
+  #MUN_NAME == "CUAUHTÉMOC"
+  mm,
+  Borough == "CUAUHTÉMOC"
+)
+
+ggplot(
+  data = cua,
+  aes(
+    x = long,
+    y = lat.x,
+    group = group,
+    fill = group
+  )
+)+ geom_polygon(alpha = .6)
+
+
+mm <- add_kriging_data(df_neigh, m_complete)
+mm$kriging_times <- format(mm$kriging_times, "%Y")
+mm$Type <- "Neighbourhood level"
+  
+p_neigh_global <- ggplot(
+  data = mm,
+  aes(
+    x = long,
+    y = lat.x,
+    group = group,
+    fill = value
+  )
+)+
+  geom_polygon(
+    alpha = .6
+  ) +
+  facet_grid(Type ~ kriging_times)+
+  coord_equal() +
+  xlab("Longitude")+
+  ylab("Latitude")+
+  theme_bw()+
+  theme(
+    panel.grid = element_line(colour = "transparent")
+  )+
+  scale_fill_gradientn(
+    #name = "Global mortality rate", 
+    name = "Rate",
+    colours = brewer.pal(9, name = "YlOrRd")
+  )
+p_neigh_global
+
+mm$Type <- "Cuauhtémoc level"
+p_neigh_global_zoom <- ggplot()+
+  geom_polygon(
+    data = subset(
+      mm,
+      Borough == "CUAUHTÉMOC"
+    ),
+    aes(
+      x = long,
+      y = lat.x,
+      group = group,
+      fill = value
+    ),
+    alpha = .6
+  ) +
+  facet_grid(Type ~ kriging_times)+
+  coord_equal() +
+  xlab("Longitude")+
+  ylab("Latitude")+
+  theme_bw()+
+  theme(
+    panel.grid = element_line(colour = "transparent")
+  )+
+  scale_fill_gradientn(
+    #name = "Global mortality rate", 
+    name = "Rate",
+    colours = brewer.pal(9, name = "YlOrRd")
+  )+
+  # geom_point(
+  #   data = kriging_coords,
+  #   aes(x = lon, y = lat),
+  #   color = "black"
+  # )+
+  xlim(range(df_borough[df_borough$MUN_NAME == "CUAUHTÉMOC",]$long))+
+  ylim(range(df_borough[df_borough$MUN_NAME == "CUAUHTÉMOC",]$lat))
+p_neigh_global_zoom
+mapView(neighborghood)+mapView(boroughs)
+
+cua <- subset(
+  df_neigh,
+  MUN_NAME == "CUAUHTÉMOC"
+)
+
+p <- ggplot()+
+  geom_polygon(
+    data = subset(
+      df_neigh,
+      MUN_NAME == "CUAUHTÉMOC"
+    ),
+    aes(
+      x = long,
+      y = lat,
+      group = group
+    )
+  )
+p
+
+p_global_borough_neigh <- plot_grid(
+  plotlist = list(
+    p_global,
+    p_neigh_global_zoom,
+    p_neigh_global
+  ),
+  ncol = 1,
+  labels = c("A", "B","C")
+)
+p_global_borough_neigh
+ggsave(
+  p_global_borough_neigh,
+  file = paste(opt$out, "Fill_me.pdf", sep = ""),
+  width = 7,
+  height = 7,
+  device = cairo_pdf  
+)
+
+################################################################################
+##borough with numbers
+################################################################################
+p_boroughs <- ggplot() +
+  geom_polygon(
+    data = df_borough,
+    aes(
+      x = long,
+      y = lat,
+      group = id
+    ),
+    alpha = .6,
+    fill = "transparent"
+  ) +
+  geom_path(
+    data = df_borough,
+    aes(
+      x = long,
+      y = lat,
+      group = group
+    ),
+    color = "black"
+  )+
+  geom_text(
+    data = boroughs@data,
+    aes(
+      x = x,
+      y = y,
+      label = ID
+    ),
+    color = "red"
+  ) + 
+  coord_equal() +
+  xlab("Longitude")+
+  ylab("Latitud")+
+  theme_bw()+
+  annotation_north_arrow(
+    location = "bl", 
+    which_north = "TRUE", 
+    pad_x = unit(0.3, "in"), 
+    pad_y = unit(0.4, "in"),
+    style = north_arrow_fancy_orienteering
+  )+
+  annotation_scale()+
+  coord_sf(crs = 4326)+
+  theme(
+    panel.grid = element_line(colour = "transparent")
+  )
+p_boroughs
+ggsave(
+  p_boroughs,
+  file = paste(opt$out, "CDMX_map_borough.pdf", sep = ""),
+  width = 5,
+  height = 5,
+  device = cairo_pdf
+)
+
+#############################################
+##Plot jointly borough + neighbourhood the graphs
+#############################################
+p_complete <- ggplot()+
+  geom_polygon(
+    data = df_neigh,
+    aes(
+      x = long,
+      y = lat,
+      group = id
+    ),
+    alpha = .6
+  ) +
+  geom_path(
+    data = df_neigh,
+    aes(
+      x = long,
+      y = lat,
+      group = group
+    ),
+    color = "white"
+  ) + 
+  geom_path(
+    data = df_borough,
+    aes(
+      x = long,
+      y = lat,
+      group = group
+    ),
+    color = "blue"
+  ) + 
+  geom_point(
+    data = boroughs@data,
+    aes(
+      x = x,
+      y = y
+    ),
+    color = "red"
+  ) + 
+  coord_equal() +
+  xlab("Longitude")+
+  ylab("Latitude")+
+  theme_bw()+
+  annotation_north_arrow(
+    location = "bl", 
+    which_north = "TRUE", 
+    pad_x = unit(0.3, "in"), 
+    pad_y = unit(0.4, "in"),
+    style = north_arrow_fancy_orienteering
+  )+
+  annotation_scale()+
+  coord_sf(crs = 4326)+
+  theme(
+    panel.grid = element_line(colour = "transparent")
+  )
+p_complete 
+ggsave(
+  p_complete,
+  file = paste(opt$out, "CDMX_map.pdf", sep = ""),
+  width = 5,
+  height = 5,
+  device = cairo_pdf
+)
+
+p_map <- plot_grid(
+  plotlist = list(
+    p_boroughs,
+    p_complete
+  ),
+  ncol = 2,
+  labels = c("A", "B")
+)
+p_map
+ggsave(
+  p_map,
+  file = paste(opt$out, "CDMX_map_double.pdf", sep = ""),
+  width = 10,
+  height = 5,
+  device = cairo_pdf
+)
+
 ############################################################################
 ## The end
 ############################################################################
+
+
+which(duplicated(paste(neighborghood$MUN_NAME, neighborghood$SETT_NAME)))
+[1] 644
+> paste(neighborghood$MUN_NAME, neighborghood$SETT_NAME)[644]
+[1] "COYOACÁN BARRIO SAN LUCAS"
+
+USAR EL OBJECT ID DE neighborghood como clave!!!!!!
+length(unique(df_neigh$id))
+[1] 2097

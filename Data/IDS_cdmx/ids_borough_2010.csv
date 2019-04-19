@@ -1,0 +1,17 @@
+Borough,IDS,Estrato,Calidad.vivienda,Acceso.salud,Rezago.educativo,Bienes.durables,Adecuación.sanitaria,Adecuación.energética,Calidad.vivienda.2,Acceso.salud.2,Rezago.educativo.2,Bienes.durables.2,Adecuación.sanitaria.2,Adecuación.energética.2
+Álvaro Obregón,0.79,Bajo,0.6600,0.5800,0.9300,0.9200,0.9000,1.0000,Muy bajo,Muy bajo,Alto,Alto,Medio,Alto
+Azcapotzalco,0.85,Medio,0.7400,0.6800,0.9600,0.9300,0.9400,1.0000,Bajo,Muy bajo,Alto,Alto,Alto,Alto
+Benito Juárez,0.95,Alto,0.9200,0.6400,0.9900,0.9000,0.9900,1.0000,Alto,Muy bajo,Alto,Medio,Alto,Alto
+Coyoacán,0.86,Medio,0.7700,0.6000,0.9600,0.9200,0.9300,1.0000,Bajo,Muy bajo,Alto,Alto,Alto,Alto
+Cuajimalpa de Morelos,0.77,Bajo,0.6500,0.5300,0.9300,0.8900,0.8400,1.0000,Muy bajo,Muy bajo,Alto,Medio,Medio,Alto
+Cuauhtémoc,0.86,Medio,0.8000,0.5900,0.9500,0.8900,0.9700,1.0000,Bajo,Muy bajo,Alto,Medio,Alto,Alto
+Gustavo A. Madero,0.80,Medio,0.6800,0.6000,0.9400,0.9000,0.9000,1.0000,Muy bajo,Muy bajo,Alto,Medio,Medio,Alto
+Iztacalco,0.82,Medio,0.7100,0.5900,0.9500,0.9200,0.9300,1.0000,Bajo,Muy bajo,Alto,Alto,Alto,Alto
+Iztapalapa,0.74,Bajo,0.6200,0.5100,0.9200,0.8800,0.8400,1.0000,Muy bajo,Muy bajo,Alto,Medio,Medio,Alto
+La Magdalena Contreras,0.76,Bajo,0.6100,0.5700,0.9200,0.9100,0.8200,1.0000,Muy bajo,Muy bajo,Alto,Alto,Medio,Alto
+Miguel Hidalgo,0.89,Medio,0.8200,0.6300,0.9700,0.9000,0.9600,1.0000,Medio,Muy bajo,Alto,Medio,Alto,Alto
+Milpa Alta,0.63,Muy bajo,0.4700,0.4100,0.9000,0.8100,0.5800,1.0000,Muy bajo,Muy bajo,Medio,Medio,Muy bajo,Alto
+Tláhuac,0.73,Bajo,0.5900,0.5200,0.9200,0.9000,0.8100,1.0000,Muy bajo,Muy bajo,Alto,Medio,Medio,Alto
+Tlalpan,0.77,Bajo,0.6600,0.5300,0.9300,0.8900,0.7400,1.0000,Muy bajo,Muy bajo,Alto,Medio,Bajo,Alto
+Venustiano Carranza,0.83,Medio,0.7400,0.5800,0.9500,0.9100,0.9500,1.0000,Bajo,Muy bajo,Alto,Alto,Alto,Alto
+Xochimilco,0.73,Bajo,0.5900,0.4900,0.9200,0.8600,0.7100,1.0000,Muy bajo,Muy bajo,Alto,Medio,Bajo,Alto

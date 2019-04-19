@@ -195,15 +195,13 @@ m_mortality$kriging_times <- as.Date(as.character(m_mortality$kriging_times))
 kriging_times <- as.Date(row.names(as.data.frame(kriging$childhood@time)))
 #Coordinates
 kriging_coords <- as.data.frame(coordinates(kriging$childhood@sp))
-kriging_coords$kriged_index <- 1:nrow(kriging_coords)
-neighborghood$OBJECTID
+kriging_coords <- cbind(
+  kriging_coords, 
+  neighborghood@data[, c("OBJECTID", "MUN_NAME", "SETT_NAME")]
+)
+#head(kriging_coords)
+#head(neighborghood@data)
 
-neighbourhood_coordinates$neigh_ID <- 1:nrow(neighbourhood_coordinates)
-kriging_coords <- merge(kriging_coords, neighbourhood_coordinates, by = c("lon", "lat"))
-kriging_coords <- kriging_coords[order(kriging_coords$kriged_index), ]
-stopifnot(all(kriging_coords$neigh_ID == kriging_coords$kriged_index)) #same oder
-kriging_coords$neigh_ID <- NULL
-kriging_coords$kriged_index <- NULL
 #Values
 kriging_values <- lapply(
   age_mortality, 
@@ -214,20 +212,41 @@ kriging_values <- lapply(
 kriging_values <- as.data.frame(do.call(cbind, kriging_values))
 names(kriging_values) <- age_mortality
 head(kriging_values)
-##Join the data
+
+##Join the data, i.e., add coords + time columnas replicates to each predicted kriging value
 kriged_data <- cbind(
-  kriging_coords,
-  kriging_times,
+  do.call(
+    rbind, 
+    lapply(
+      1:length(kriging_times),
+      function(iteration){
+        return(kriging_coords)
+      }
+    )
+  ),
+  times = do.call(
+    c,
+    lapply(
+      kriging_times, 
+      rep,
+      nrow(kriging_coords)
+    )
+  ),
   kriging_values
 )
+head(kriged_data)  
+  
+#Melt the data  
 m_kriged_data <- melt(
   kriged_data,
-  id.vars = c("lon", "lat", "MUN_NAME", "SETT_NAME", "ID", "kriging_times"),
+  id.vars = c("lon", "lat", "MUN_NAME", "SETT_NAME", "OBJECTID", "times"),
   variable.name = "Type"
 )
 m_kriged_data$level <- "Neighbourhood" 
+head(m_kriged_data)
 
 #Joining borough and neighbourhood data into a single object
+names(m_mortality)[5:6] <- c("OBJECTID", "times")
 m_complete <- rbind(
   m_kriged_data,
   m_mortality
@@ -252,7 +271,7 @@ m_complete$Type <- factor(
   )
 )
 m_complete$Borough <- m_complete$MUN_NAME
-m_complete$MUN_NAME <- NULL
+#m_complete$MUN_NAME <- NULL
 
 ############################################################################
 ##Ploting data at last
@@ -265,7 +284,7 @@ p_time_raw <- ggplot(
     level == "Borough" & Type == "Global"
   ),
   aes(
-    x = kriging_times,
+    x = times,
     y = value,
     group = Borough,
     colour = Borough
@@ -306,14 +325,17 @@ write.csv(
 p_neigh_time <- ggplot(
   data = subset(
     m_complete,
-    level == "Neighbourhood" & Type == "Global" & Borough == "TLALPAN" &
-      kriging_times %in% as.Date(
+    level == "Neighbourhood" & Borough == "MILPA ALTA" & #Type == "Global" &
+      # times < as.Date(
+      #  paste(2016, "-01-02", sep = "")
+      # )
+      times %in% as.Date(
        paste(2000:2016, "-01-01", sep = "")
-      ) &
-      SETT_NAME %in% unique(m_complete$SETT_NAME[m_complete$Borough == "TLALPAN"])[8:15]
+      ) # &
+      # SETT_NAME %in% unique(m_complete$SETT_NAME[m_complete$Borough == "TLALPAN"])
   ),
   aes(
-    x = kriging_times,
+    x = times,
     y = value,
     group = SETT_NAME,
     colour = SETT_NAME
@@ -324,7 +346,7 @@ p_neigh_time <- ggplot(
   geom_point()+
   #geom_smooth(se = FALSE)+
   geom_line(linetype = "dashed")+
-  #facet_grid(Type ~ ., scales = "free_y")+
+  facet_grid(Type ~ ., scales = "free_y")+
   theme_bw()+
   theme(
     legend.position = "none"
@@ -356,7 +378,7 @@ add_mortality <- function(
     m_complete,
     Type %in% type &
       level %in% Level &
-      kriging_times %in% time
+      times %in% time
   )
   
   mm <- merge(
@@ -370,7 +392,7 @@ add_mortality <- function(
 }
 
 mm <- add_mortality(df_borough, m_complete)
-mm$kriging_times <- format(mm$kriging_times, "%Y")
+mm$times <- format(mm$times, "%Y")
 
 p_kriged_time_borough <- ggplot(
   data = mm,
@@ -386,7 +408,7 @@ p_kriged_time_borough <- ggplot(
   ) +
   geom_path(color = "white")+
   #geom_point() + #los del polígono
-  facet_grid(Type ~ kriging_times)+
+  facet_grid(Type ~ times)+
   coord_equal() +
   xlab("Longitude")+
   ylab("Latitud")+
@@ -422,7 +444,7 @@ p_global <- ggplot(
   ) +
   geom_path(color = "white")+
   #geom_point() + #los del polígono
-  facet_grid(Type ~ kriging_times)+
+  facet_grid(Type ~ times)+
   coord_equal() +
   #xlab("Longitude")+
   #ylab("Latitude")+
@@ -463,7 +485,7 @@ intermediate_plot <-function(mm, type){
   ) +
   geom_path(color = "white")+
   #geom_point() + #los del polígono
-  facet_grid(Type ~ kriging_times)+
+  facet_grid(Type ~ times)+
   coord_equal() +
   #xlab("Longitude")+
   #ylab("Latitude")+
@@ -487,7 +509,7 @@ intermediate_plot <-function(mm, type){
 p <- lapply(
   levels(mm$Type)[-c(1,6)],
   intermediate_plot, 
-  mm =mm
+  mm = mm
 )
 
 p_infant <- ggplot(
@@ -507,7 +529,7 @@ p_infant <- ggplot(
   ) +
   geom_path(color = "white")+
   #geom_point() + #los del polígono
-  facet_grid(Type ~ kriging_times)+
+  facet_grid(Type ~ times)+
   coord_equal() +
   #xlab("Longitude")+
   #ylab("Latitude")+
@@ -528,8 +550,6 @@ p_infant <- ggplot(
     colours = brewer.pal(9, name = "YlOrRd")
   )
 #p_infant
-
-
 #grid.arrange
 
 raw <- plot_grid(
@@ -555,7 +575,7 @@ ggsave(
 ################################################################################
 #p_global
 mm <- add_mortality(df_borough, m_complete)
-mm$kriging_times <- format(mm$kriging_times, "%Y")
+mm$times <- format(mm$times, "%Y")
 mm <- subset(
   mm,
   Type == "Global"
@@ -576,24 +596,26 @@ p_global <- ggplot(
   ) +
   geom_path(color = "white")+
   #geom_point() + #los del polígono
-  facet_grid(Type ~ kriging_times)+
+  facet_grid(Type ~ times)+
   coord_equal() +
-  #xlab("Longitude")+
+  xlab("Longitude")+
   ylab("Latitude")+
   #ylab(" ")+
   theme_bw()+
   theme(
     #legend.position = "left",
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.title.x = element_blank(),
-    panel.grid = element_line(colour = "transparent")
+    #axis.text.x = element_blank(),
+    #axis.ticks.x = element_blank(),
+    #axis.title.x = element_blank(),
+    panel.grid = element_line(colour = "transparent"),
+    axis.text.x = element_text(angle = 35, h = 1)
     #title = element_blank()
     #axis.text = element_blank()
   )+
   scale_fill_gradientn(
     name = "Rate", 
-    colours = brewer.pal(9, name = "YlOrRd")
+    colours = brewer.pal(9, name = "YlOrRd"),
+    limits=c(3.6,10)
   )
 p_global
 
@@ -606,7 +628,7 @@ add_kriging_data <- function(
       "-01-01", 
       sep = ""
     )
-  )[1],
+  ),
   type = "Global",
   Level = "Neighbourhood"
 ){
@@ -618,51 +640,23 @@ add_kriging_data <- function(
     m_complete,
     Type %in% type &
       level %in% Level &
-      kriging_times %in% time
+      times %in% time
   )
   head(kriged,2)
-  dim(kriged)
-  length(unique(df_neigh$SETT_NAME))
-  
   
   mm <- merge(
     map, 
     kriged,
-    by.x = "SETT_NAME",
-    by.y = "SETT_NAME",
+    by.x = "id",
+    by.y = "OBJECTID",
     all.x = TRUE,
     all.y = FALSE
   )
   return(mm)
 }
 
-head(map, 2)
-head(kriged, 2)
-dim(map)
-dim(kriged)
-dim(mm)
-summary(mm$value)
-
-cua <- subset(
-  #df_neigh,
-  #MUN_NAME == "CUAUHTÉMOC"
-  mm,
-  Borough == "CUAUHTÉMOC"
-)
-
-ggplot(
-  data = cua,
-  aes(
-    x = long,
-    y = lat.x,
-    group = group,
-    fill = group
-  )
-)+ geom_polygon(alpha = .6)
-
-
 mm <- add_kriging_data(df_neigh, m_complete)
-mm$kriging_times <- format(mm$kriging_times, "%Y")
+mm$times <- format(mm$times, "%Y")
 mm$Type <- "Neighbourhood level"
   
 p_neigh_global <- ggplot(
@@ -677,18 +671,20 @@ p_neigh_global <- ggplot(
   geom_polygon(
     alpha = .6
   ) +
-  facet_grid(Type ~ kriging_times)+
+  facet_grid(Type ~ times)+
   coord_equal() +
   xlab("Longitude")+
   ylab("Latitude")+
   theme_bw()+
   theme(
-    panel.grid = element_line(colour = "transparent")
+    panel.grid = element_line(colour = "transparent"),
+    axis.text.x = element_text(angle = 35, h = 1)
   )+
   scale_fill_gradientn(
     #name = "Global mortality rate", 
     name = "Rate",
-    colours = brewer.pal(9, name = "YlOrRd")
+    colours = brewer.pal(9, name = "YlOrRd"),
+    limits=c(3.6,10)
   )
 p_neigh_global
 
@@ -707,53 +703,35 @@ p_neigh_global_zoom <- ggplot()+
     ),
     alpha = .6
   ) +
-  facet_grid(Type ~ kriging_times)+
+  facet_grid(Type ~ times)+
   coord_equal() +
   xlab("Longitude")+
   ylab("Latitude")+
   theme_bw()+
   theme(
-    panel.grid = element_line(colour = "transparent")
+    panel.grid = element_line(colour = "transparent"),
+    axis.text.x = element_text(angle = 35, h = 1)
   )+
   scale_fill_gradientn(
     #name = "Global mortality rate", 
     name = "Rate",
-    colours = brewer.pal(9, name = "YlOrRd")
-  )+
+    colours = brewer.pal(9, name = "YlOrRd"),
+    limits=c(3.6,10)
+  )
   # geom_point(
   #   data = kriging_coords,
   #   aes(x = lon, y = lat),
   #   color = "black"
   # )+
-  xlim(range(df_borough[df_borough$MUN_NAME == "CUAUHTÉMOC",]$long))+
-  ylim(range(df_borough[df_borough$MUN_NAME == "CUAUHTÉMOC",]$lat))
+  #xlim(range(df_borough[df_borough$MUN_NAME == "CUAUHTÉMOC",]$long))+
+  #ylim(range(df_borough[df_borough$MUN_NAME == "CUAUHTÉMOC",]$lat))
 p_neigh_global_zoom
-mapView(neighborghood)+mapView(boroughs)
-
-cua <- subset(
-  df_neigh,
-  MUN_NAME == "CUAUHTÉMOC"
-)
-
-p <- ggplot()+
-  geom_polygon(
-    data = subset(
-      df_neigh,
-      MUN_NAME == "CUAUHTÉMOC"
-    ),
-    aes(
-      x = long,
-      y = lat,
-      group = group
-    )
-  )
-p
 
 p_global_borough_neigh <- plot_grid(
   plotlist = list(
     p_global,
-    p_neigh_global_zoom,
-    p_neigh_global
+    p_neigh_global,
+    p_neigh_global_zoom
   ),
   ncol = 1,
   labels = c("A", "B","C")
@@ -761,9 +739,9 @@ p_global_borough_neigh <- plot_grid(
 p_global_borough_neigh
 ggsave(
   p_global_borough_neigh,
-  file = paste(opt$out, "Fill_me.pdf", sep = ""),
-  width = 7,
-  height = 7,
+  file = paste(opt$out, "Spatial_time_global_3level_zoom.pdf", sep = ""),
+  width = 8,
+  height = 8,
   device = cairo_pdf  
 )
 
@@ -909,12 +887,3 @@ ggsave(
 ## The end
 ############################################################################
 
-
-which(duplicated(paste(neighborghood$MUN_NAME, neighborghood$SETT_NAME)))
-[1] 644
-> paste(neighborghood$MUN_NAME, neighborghood$SETT_NAME)[644]
-[1] "COYOACÁN BARRIO SAN LUCAS"
-
-USAR EL OBJECT ID DE neighborghood como clave!!!!!!
-length(unique(df_neigh$id))
-[1] 2097

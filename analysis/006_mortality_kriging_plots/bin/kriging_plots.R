@@ -313,6 +313,7 @@ ggsave(
   width = 10,
   height = 8
 )
+m_complete$days <- julian(m_complete$times) - min(julian(m_complete$times))
 write.csv(
   m_complete,
   row.names = FALSE,

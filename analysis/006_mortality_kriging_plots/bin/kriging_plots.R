@@ -314,12 +314,43 @@ ggsave(
   height = 8
 )
 m_complete$days <- julian(m_complete$times) - min(julian(m_complete$times))
+m_time_neigh <- subset(
+  m_complete,
+  level != "Borough" & times < "2016-01-02"
+) 
+m_neigh <- subset(
+  m_complete,
+  level != "Borough" & times %in% as.Date(paste(2000:2016, "-01-01", sep = ""))
+) 
+m_borough <- subset(
+  m_complete,
+  level == "Borough"
+)
 write.csv(
   m_complete,
   row.names = FALSE,
   quote = FALSE,
   file = paste(opt$out, "Mortality_borough_crude.csv")
 )
+write.csv(
+  m_time_neigh,
+  row.names = FALSE,
+  quote = FALSE,
+  file = paste(opt$out, "Time_neighbourhood.csv")
+)
+write.csv(
+  m_neigh,
+  row.names = FALSE,
+  quote = FALSE,
+  file = paste(opt$out, "Neighbourhood.csv")
+)
+write.csv(
+  m_borough,
+  row.names = FALSE,
+  quote = FALSE,
+  file = paste(opt$out, "Borough.csv")
+)
+
 ############################################################################
 ## Using kriging data
 ############################################################################
@@ -516,7 +547,7 @@ p <- lapply(
 p_infant <- ggplot(
   data = subset(
     mm,
-    Type == "Global"
+    Type == "Infant"
   ),
   aes(
     x = long,

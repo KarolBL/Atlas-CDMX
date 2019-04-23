@@ -6,6 +6,7 @@ library("sf")
 library("rgeos")
 library("raster")
 library("geosphere")
+library("spacetime")
 library("sp")
 library("rgdal")
 library("leaflet")
@@ -357,7 +358,7 @@ write.csv(
 p_neigh_time <- ggplot(
   data = subset(
     m_complete,
-    level == "Neighbourhood" & Borough == "MILPA ALTA" & #Type == "Global" &
+    level == "Neighbourhood" & Borough == "CUAUHTÉMOC" & #Type == "Global" &
       # times < as.Date(
       #  paste(2016, "-01-02", sep = "")
       # )
@@ -720,7 +721,7 @@ p_neigh_global <- ggplot(
   )
 p_neigh_global
 
-mm$Type <- "Cuauhtémoc level"
+mm$Type <- "Cuauhtémoc borough"
 p_neigh_global_zoom <- ggplot()+
   geom_polygon(
     data = subset(

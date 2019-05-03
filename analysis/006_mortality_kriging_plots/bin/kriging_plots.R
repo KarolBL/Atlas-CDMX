@@ -282,7 +282,7 @@ m_complete$Borough <- m_complete$MUN_NAME
 p_time_raw <- ggplot(
   data = subset(
     m_complete,
-    level == "Borough" & Type == "Global"
+    level == "Borough" & times %in% as.Date(paste(2000:2016, "-01-01", sep = ""))
   ),
   aes(
     x = times,
@@ -304,9 +304,9 @@ p_time_raw <- ggplot(
 p_time_raw
 ggsave(
   p_time_raw,
-  file = paste(opt$out, "Time_mortality_borough_crude.pdf"),
+  file = paste(opt$out, "Time_mortality_borough_crude.pdf", sep = ""),
   width = 10,
-  height = 8
+  height = 13
 )
 ggsave(
   p_time_raw,
@@ -916,6 +916,84 @@ ggsave(
   device = cairo_pdf
 )
 
+############################################################################
+##Cuauhtémoc with numbers
+############################################################################
+cuauhtemoc <- subset(
+  df_neigh,
+  MUN_NAME == "CUAUHTÉMOC"
+)
+neighborghood@data$ID <- 1:nrow(neighborghood@data)
+ncoord <- subset(
+  neighbourhood_coordinates,
+  MUN_NAME == "CUAUHTÉMOC"
+)
+ncoord$ID <- c(
+  2, 1, 26, 30, 34, 16, 32, 33, 23, 27, 29, 6, 5, 11, 25, 18, 7, 10, 3, 8, 4,
+  13, 22, 17, 9, 12, 14, 31, 19, 21, 20, 28, 15, 24
+)
+
+cua_names <- ncoord[order(ncoord$ID),]
+tolower(gsub(
+  toString(apply(cua_names[, c("ID", "SETT_NAME")], 1, toString, sep = ". ")),
+  pattern = ", ",
+  replacement = ". "
+))
+
+p_cuauhtemoc <- ggplot() +
+  geom_polygon(
+    data = cuauhtemoc,
+    aes(
+      x = long,
+      y = lat,
+      group = id
+    ),
+    alpha = .6,
+    fill = "transparent"
+  ) +
+  geom_path(
+    data = cuauhtemoc,
+    aes(
+      x = long,
+      y = lat,
+      group = group
+    ),
+    color = "black"
+  )+
+  geom_text(
+    data = ncoord,
+    aes(
+      x = lon,
+      y = lat,
+      label = ID
+    ),
+    color = "blue"
+  ) +
+  coord_equal() +
+  xlab("Longitude")+
+  ylab("Latitud")+
+  theme_bw()+
+  # annotation_north_arrow(
+  #   location = "bl", 
+  #   which_north = "TRUE", 
+  #   pad_x = unit(4.2, "in"), 
+  #   pad_y = unit(0, "in"),
+  #   style = north_arrow_fancy_orienteering
+  # )+
+  annotation_scale()+
+  coord_sf(crs = 4326)+
+  theme(
+    panel.grid = element_line(colour = "transparent")
+  )
+p_cuauhtemoc
+
+save(
+  p_cuauhtemoc,
+  cuauhtemoc,
+  ncoord,
+  file = paste(opt$out, "Cuauhtemoc.RData", sep = ""),
+  compress = "xz"
+)
 ############################################################################
 ## The end
 ############################################################################

@@ -105,5 +105,33 @@ contaminants <- merge(
   all.x = TRUE
 )
 
+contaminants$Contaminant <- factor(
+  as.character(contaminants$Contaminant),
+  levels = c(
+    "CO", "NO2", "O3", "SO2", "PM25", "PM10", "NO", "NOX", "PMCO"
+  )
+)
+  
+############################################################
+#Plot the stations
+
+p <- ggplot(
+  data = contaminants,
+  aes(
+    x = lon,
+    y = lat,
+    colour = Contaminant
+  )
+)+
+  geom_point()+
+  xlab("Longitude")+
+  ylab("Latitude")+
+  facet_wrap(Contaminant ~ ., ncol =2)+
+  theme_bw()+
+  theme(
+    legend.position = "NULL"
+  )
+p
+
 
 

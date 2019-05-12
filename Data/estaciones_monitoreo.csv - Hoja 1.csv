@@ -1,0 +1,47 @@
+,,,,,,,,,,,,,,,,,,,,
+Clave,Nombre,Alcaldía o municipio,Entidad,id,Estatus,Latitud,Longitud,Altitud,Subred.1,RAMA.Operación,RAMA.Parámetros,Subred.2,REDMET.Operación,REDMET.Parámetros,Subred.3,REDDA.Operación,REDDA.Parámetros,Subred.4,REDMA.Operación,REDMA.Parámetros
+ACO,Acolman,Acolman,Estado de México,484150020109,Activa,19.635.501,-98.912.003,2198,RAMA,2007-actual,"O3, NOX, NO2, NO, CO, SO2, PM10",REDMET,2011-actual,"VV, DV, TMP, HR, RADG",,,,,,
+AJU,Ajusco,Tlalpan,CDMX,484090120400,Activa,19.154.674,-99.162.459,2953,RAMA,2015-actual,"O3, NOX, NO2, NO, PM2.5",REDMET,2015-actual,"VV, DV, TMP, HR",REDDA,1998-actual,"Depósito atmosférico, pH",,,
+AJM,Ajusco Medio,Tlalpan,CDMX,484090120609,Activa,19.272.100,-99.207.658,2619,RAMA,2015-actual,"O3, NOX, NO2, NO, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,2015-actual,"VV, DV, TMP, HR",,,,,,
+ATI,Atizapán,Atizapán de Zaragoza,Estado de México,484150130101,Activa,9.576.963,-99.254.133,2341,RAMA,1994-actual,"O3, NOX, NO2, NO, CO, SO2, PM10",,,,,,,,,
+BJU,Benito Juarez,Benito Juárez,CDMX,484090140309,Activa,19.371.612,-99.158.969,2250,RAMA,2015-actua,"O3,NO2, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,2015-actual,"VV, DV, TMP, HR",,,,,,
+CAM,Camarones,Azcapotzalco,CDMX,484090020301,Activa,19.468.404,-99.169.794,2233,RAMA,2003-actual,"O3, NOX, NO2, NO, CO, SO2, PM10, PM2.5, PM10-2.5",,,,,,,,,
+CCA,Centro de Ciencias de la Atmósfera,Coyoacán,CDMX,484090030501,Activa,193.262,-991.761,2280,RAMA,2014-actual,"O3, NOX, NO2, NO, CO, SO2, PM2.5",,,,,,,,,
+TEC,Cerro del Tepeyac,Gustavo A. Madero,CDMX,484090050404,Activa,19.487.227,-99.114.229,2265,,,,,,,REDDA,1988-actual,"Depósito atmosférico, pH",,,
+CHO,Chalco,Chalco,Estado de México,484150250109,Activa,19.266.948,-98.886.088,2253,RAMA,2011-actual,"O3, NOX, NO2, NO, CO, SO2, PM10",REDMET,2007-actual,"VV, DV, TMP, HR, RADG",,,,,,
+COR,CORENA,Xochimilco,CDMX,484090130204,Activa,19.265.346,-9.902.604,2242,,,,,,,REDDA,1990-actual,"Depósito atmosférico, pH",,,
+CUA,Cuajimalpa,Cuajimalpa de Morelos,CDMX,484090040109,Activa,19.365.313,-99.291.705,2704,RAMA,1994-actual,"O3, NOX, NO2, NO, CO, SO2, PM10",REDMET,2000-actual,"VV, DV, TMP, HR",,,,,,
+CUT,Cuautitlán,Tepotzotlán,Estado de México,484150950109,Activa,19.722.186,-99.198.602,2263,RAMA,2012-actual,"O3, NOX, NO2, NO, SO2, PM10",REDMET,2012-actual,"VV, DV, TMP, HR, RADG",,,,,,
+DIC,Diconsa,Tlalpan,CDMX,484090120304,Activa,19.298.819,-99.185.774,2305,,,,,,,REDDA,1988-actual,"Depósito atmosférico, pH",,,
+EAJ,Ecoguardas Ajusco,Tlalpan,CDMX,484090120504,Activa,19.271.222,-99.203.971,2584,,,,,,,REDDA,1998-actual,"Depósito atmosférico, pH",,,
+EDL,Ex Convento Desierto de los Leones,Cuajimalpa de Morelos,CDMX,484090040204,Activa,19.313.357,-99.310.635,2980,,,,,,,REDDA,1998-actual,"Depósito atmosférico, pH",,,
+FAC,FES Acatlán,Naucalpan de Juárez,Estado de México,484150570109,Activa,19.482.473,-99.243.524,2299,RAMA,1986-actual,"O3, NOX, NO2, NO, CO, SO2, PM10",REDMET,1986-actual,"VV, DV, TMP, HR, UVA, UVB",,,,,,
+FAR,FES Aragón,Nezahualcóyotl,Estado de México,484800150584,Activa,19.473.692,-99.046.176,2230,RAMA,2019-actual,"O3, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,2019-actual,"VV, DV, TMP, HR",,,,,,
+GAM,Gustavo A. Madero,Gustavo A. Madero,CDMX,484090050809,Activa,194.827,-99.094.517,2227,RAMA,2015-actual,"O3, NO2, PM2.5",REDMET,2015-actual,"VV, DV, TMP, HR",,,,,,
+HGM,Hospital General de México,Cuauhtémoc,CDMX,484090150409,Activa,19.411.617,-99.152.207,2234,RAMA,2012-actual,"O3, NOX, NO2, NO, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,2012-actual,"VV, DV, TMP, HR",,,,,,
+INN,Investigaciones Nucleares,Ocoyoacac,Estado de México,484150620109,Activa,19.291.968,-9.938.052,3082,RAMA,2015-actual,"O3, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,2015-actual,"VV, DV, TMP, HR",,,,,,
+IZT,Iztacalco,Iztacalco,CDMX,484090060101,Activa,19.384.413,-99.117.641,2238,RAMA,2007-actual,"O3, NOX, NO2, NO, CO, SO2, PM10",,,,,,,,,
+LPR,La Presa,Tlalnepantla de Baz,Estado de México,484151040203,Activa,19.534.727,-9.911.772,2302,RAMA,1986-actual,"O3, NOX, NO2, NO, CO, SO2",,,,,,,REDMA,1989-actual,"PM10, Pb"
+LAA,Laboratorio de Análisis Ambiental,Gustavo A. Madero,CDMX,484090050604,Activa,19.483.781,-99.147.312,2255,,,,REDMET,2016-actual,"VV, DV, TMP, HR, UVA, UVB, PA",REDDA,1995-actual,"Depósito atmosférico, pH",,,
+IBM,Legaria,Miguel Hidalgo,CDMX,484090160504,Activa,19.443.319,-9.921.536,2314,,,,,,,REDDA,1989-actual,"Depósito atmosférico, pH",,,
+LOM,Lomas,Miguel Hidalgo,CDMX,484090160406,Activa,19.403,-99.242.062,2434,,,,,,,REDDA,1988-actual,"Depósito atmosférico, pH",REDMA,1989-actual,PM10
+LLA,Los Laureles,Ecatepec de Morelos,Estado de México,484150330201,Activa,19.578.792,-99.039.644,2230,RAMA,1986-actual,"O3, NOX, NO2, NO, CO, SO2",,,,,,,,,
+MER,Merced,Venustiano Carranza,CDMX,484090170127,Activa,1.942.461,-99.119.594,2245,RAMA,1986-actual,"O3, NOX, NO2, NO, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,1986-actual,"VV, DV, TMP, HR, RADG, UVA, UVB, PA",REDMA,1989-actual,"PST, PM10, PM2.5, Pb",,,
+MGH,Miguel Hidalgo,Miguel Hidalgo,CDMX,484090160609,Activa,19.404.050,-99.202.603,2366,RAMA,2015-actual,"O3, NOX, NO2, NO, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,2015-actual,"VV, DV, TMP, HR,RADG",,,,,,
+MPA,Milpa Alta,Milpa Alta,CDMX,484090090104,Activa,19.176.900,-98.990.189,2594,RAMA,2016-actual,"O3, NOX, NO2, NO, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,2016-actual,"VV, DV, TMP, HR, UVA, UVB",REDDA,1998-actual,"Depósito atmosférico, pH",,,
+MON,Montecillo,Texcoco,Estado de México,484150990113,Activa,19.460.415,-98.902.853,2252,RAMA,1994-actual,"O3, NOX, NO2, NO, CO, SO2",REDMET,2000-actual,"VV, DV, TMP, HR, RADG, UVA, UVB",REDDA,1994-actual,"Depósito atmosférico, pH",,,
+MCM,Museo de la Ciudad de México,Cuauhtémoc,CDMX,484090150304,Activa,19.429.071,-99.131.924,2237,,,,,,,REDDA,1988-actual,"Depósito atmosférico, pH",REDMA,1989-2002,PM10
+NEZ,Nezahualcóyotl,Nezahualcóyotl,Estado de México,484150580115,Activa,19.393.734,-99.028.212,2235,RAMA,2011-actual,"O3, NOX, NO2, NO, CO, SO2, PM2.5",REDMET,2011-actual,"VV, DV, TMP, HR",REDMA,1989-actual,"PM10, Pb",REDDA,1990-actual,"Depósito atmosférico, pH"
+PED,Pedregal,Álvaro Obregón,CDMX,484090100127,Activa,19.325.146,-99.204.136,2326,RAMA,1986-actual,"O3, NOX, NO2, NO, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,1986-actual,"VV, DV, TMP, HR, UVA, UVB",REDMA,1989-actual,"PST, PM10, PM2.5, Pb",,,
+SAG,San Agustín,Ecatepec de Morelos,Estado de México,484150330327,Activa,19.532.968,-99.030.324,2241,RAMA,1986-actual,"O3, NOX, NO2, NO, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,1986-actual,"VV, DV, TMP, HR, UVA, UVB",REDMA,2003-actual,PM2.5,,,
+SNT,San Nicolás Totolapan,La Magdalena Contreras,CDMX,484090080104,Activa,19.250.385,-99.256.462,2946,,,,,,,,,,REDDA,1998-actual,"Depósito atmosférico, pH"
+SFE,Santa Fe,Cuajimalpa de Morelos,CDMX,484090040309,Activa,19.357.357,-99.262.865,2599,RAMA,2012-actual,"O3, NOX, NO2, NO, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,2012-actual,"VV, DV, TMP, HR, RADG, UVA, UVB",,,,,,
+SAC,Santiago Acahualtepec,Iztapalapa,CDMX,484800090073,Activa,1.934.561,-99.009.381,2293,RAMA,2019-actual,"O3, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,2019-actual,"VV, DV, TMP, HR",,,,,,
+SHA,Secretaría de Hacienda,Miguel Hidalgo,CDMX,484090160202,Activa,19.446.203,-99.207.868,2272,,,,,,,REDMA,1989-actual,PM10,,,
+TAH,Tláhuac,Xochimilco,CDMX,484090130309,Activa,19.246.459,-99.010.564,2297,RAMA,1994-actual,"O3, NOX, NO2, NO, CO, SO2, PM10",REDMET,2000-actual,"VV, DV, TMP, HR",,,,,,
+TLA,Tlalnepantla,Tlalnepantla de Baz,Estado de México,484151040115,Activa,19.529.077,-99.204.597,2311,RAMA,1986-actual,"O3, NOX, NO2, NO, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,1986-actual,"VV, DV, TMP, HR, RADG, UVA, UVB",REDMA,1989-actual,"PST, PM10, PM2.5, Pb",REDDA,1989-actual,"Depósito atmosférico, pH"
+TLI,Tultitlán,Tultitlán,Estado de México,484151090101,Activa,19.602.542,-99.177.173,2313,RAMA,1994-actual,"O3, NOX, NO2, NO, CO, SO2, PM10",,,,,,,,,
+UIZ,UAM Iztapalapa,Iztapalapa,CDMX,484090070219,Activa,19.360.794,-9.907.388,2221,RAMA,1987-actual,"O3, NOX, NO2, NO, CO, SO2, PM10, PM2.5, PM10-2.5",,,,REDMA,1989-actual,"PST, PM10, PM2.5, Pb",,,
+UAX,UAM Xochimilco,Coyoacán,CDMX,484090030401,Activa,19.304.441,-99.103.629,2246,RAMA,2012-actual,"O3, NOX, NO2, NO, CO, SO2, PM2.5",,,,,,,,,
+VIF,Villa de las Flores,Coacalco de Berriozábal,Estado de México,484150200109,Activa,19.658.223,-9.909.659,2242,RAMA,1994-actual,"O3, NOX, NO2, NO, CO, SO2, PM10",REDMET,2000-actual,"VV, DV, TMP, HR",,,,,,
+XAL,Xalostoc,Ecatepec de Morelos,Estado de México,484150330415,Activa,19.525.995,-990.824,2160,RAMA,1986-actual,"O3, NOX, NO2, NO, CO, SO2, PM10, PM2.5, PM10-2.5",REDMET,1986-actual,"VV, DV, TMP, HR, RADG",REDMA,1989-actual,"PST, PM10, PM2.5, Pb",REDDA,1989-actual,"Depósito atmosférico, pH"

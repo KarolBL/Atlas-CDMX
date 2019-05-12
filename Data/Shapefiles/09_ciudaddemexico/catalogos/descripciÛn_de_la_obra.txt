@@ -1,0 +1,12 @@
+DESCRIPCIÓN DE LA OBRA 
+
+
+MARCO GEOESTADÍSTICO, DICIEMBRE 2018
+
+El Instituto Nacional de Estadística y Geografía (INEGI), responsable de brindar el servicio público de información estadística y geográfica, presenta el producto MARCO GEOESTADÍSTICO, DICIEMBRE 2018, siendo éste la representación vectorial en sus diferentes niveles de desagregación, con sus respectivas claves y nombres que permiten integrar un Catálogo Único de Claves de Áreas Geoestadísticas Estatales, Municipales y Localidades al mes de septiembre del 2018.
+Es un producto que se integra de archivos digitales en formato shape, compuesto de 32 carpetas, cada una nombrada por la clave geoestadística de la entidad correspondiente. 
+La base de actualización corresponde al MARCO GEOESTADÍSTICO, JUNIO 2018.
+
+El Marco Geoestadístico se utiliza con propósitos de captación, almacenamiento, procesamiento, análisis y presentación de resultados, derivados de la información estadística nacional que se recopila a través de los censos y las encuestas.
+
+La información está referida en base a los parámetros: Cónica Conforme de Lambert (CCL), Dátum ITRF2008. 

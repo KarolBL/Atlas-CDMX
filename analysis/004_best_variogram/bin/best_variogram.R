@@ -81,13 +81,13 @@ if(is.null(opt$file)){
 }
 ############################################################
 # Debuging
-# opt$file <- "../data/mortality_general.RData"
-# opt$out <- "../results/mortality_general.RData"
-# opt$initial <- "../results/mortality_general.initial.txt"
-# opt$rmse <- "../results/mortality_general.rsme.txt"
-# opt$winner <- "../results/mortality_general.winner.txt"
-# opt$best <- "../results/mortality_general.best.txt"
-# opt$pdf <- "../results/mortality_general.pdf"
+# opt$file <- "../data/pollution/na/NO2.RData"
+# opt$out <- "../results/pollution/na/NO2.RData"
+# opt$initial <- "../results/pollution/na/NO2.initial.txt"
+# opt$rmse <- "../results/pollution/na/NO2.rsme.txt"
+# opt$winner <- "../results/pollution/na/NO2.winner.txt"
+# opt$best <- "../results/pollution/na/NO2.best.txt"
+# opt$pdf <- "../results/pollution/na/NO2.pdf"
 # opt$cores <- 3
 options(mc.cores = opt$cores)
 options(width = 150)
@@ -219,7 +219,7 @@ bestmodel2use <- fittedSTVariograms[[
 #Plotting the variograms
 pdf(
     file = opt$pdf,
-    width = 7, height = 10
+    width = 7, height = 7
 )  
 plot(
   sample_vgmST, 
@@ -230,7 +230,8 @@ plot(
     fittedSTVariograms$sumMetric[[winner["sumMetric"]]],
     fittedSTVariograms$simpleSumMetric[[winner["simpleSumMetric"]]] 
   ),
-  all = TRUE
+  all = TRUE, 
+  layout = c(3,2)
 )
 dev.off()
 

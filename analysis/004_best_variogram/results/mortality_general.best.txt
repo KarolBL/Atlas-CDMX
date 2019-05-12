@@ -1,2 +1,0 @@
-"","rmse","covariance","join","space","time"
-"1",0.594508437673815,"metric","Nug",NA,NA

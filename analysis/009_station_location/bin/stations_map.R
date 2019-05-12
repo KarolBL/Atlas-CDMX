@@ -111,6 +111,11 @@ contaminants$Contaminant <- factor(
     "CO", "NO2", "O3", "SO2", "PM25", "PM10", "NO", "NOX", "PMCO"
   )
 )
+levels(contaminants$Contaminant) <- c(
+  "CO", "NO[2]", "O[3]", "SO[2]", "PM[25]", "PM[10]", "NO", "NO[X]", "PM[CO]")
+
+############################################################
+#Loading 
   
 ############################################################
 #Plot the stations
@@ -126,7 +131,7 @@ p <- ggplot(
   geom_point()+
   xlab("Longitude")+
   ylab("Latitude")+
-  facet_wrap(Contaminant ~ ., ncol =2)+
+  facet_wrap(Contaminant ~ ., ncol = 2, labeller = label_parsed)+
   theme_bw()+
   theme(
     legend.position = "NULL"

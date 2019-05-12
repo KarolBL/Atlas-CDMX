@@ -1,0 +1,12 @@
+<config.mk
+
+#Obtain the empirical variograms and tested variogram model fit
+results/%.RData: data/%.RData
+	set -x
+	mkdir -p `dirname $target`
+ 	Rscript bin/variograms.R \
+		--file $prereq \
+		--out $target".build" \
+		--cores $NT \
+	&& mv $target".build" $target
+

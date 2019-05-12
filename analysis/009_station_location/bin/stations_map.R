@@ -14,7 +14,7 @@ library("grDevices")
 ############################################################
 option_list <- list(
   make_option(
-    c("-c", "--contaminants"), 
+    c("-n", "--contaminants"), 
     type = "character", 
     default = NULL, 
     help = "dataset file name", 

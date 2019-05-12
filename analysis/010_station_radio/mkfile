@@ -1,0 +1,13 @@
+<config.mk
+
+#Obtain the station location and contaminant distribution
+results/stations.pdf:	data/contaminants
+	set -x
+	mkdir -p `dirname $target`
+ 	Rscript bin/stations_map.R \
+		--contaminants "data/contaminants" \
+		--maps "data/09mun" \
+		--out $target".build.pdf" \
+		--cores $NT \
+	&& mv $target".build.pdf" $target
+

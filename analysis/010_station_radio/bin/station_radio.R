@@ -271,39 +271,3 @@ ggsave(
   height = 8,
   device = cairo_pdf 
 )
-
-
-#Format the data
-contaminant$station_code <- factor(
-  as.character(contaminant$station_code),
-  levels = names(sort(table(contaminant$station_code)))
-)
-
-if(regexpr(opt$file, pattern = "missing")>0){
-  contaminant$value <- contaminant$value / 168 * 100
-}
-
-#Make the ggplot of missing data
-p <- ggplot(
-  data = contaminant,
-  aes(
-    x = date,
-    y = station_code,
-    fill = value
-  )
-) + 
-  geom_tile(width=7)+
-  scale_fill_gradient2(low = "green", mid = "yellow", high = "red", name = unique(contaminant$pollutant))+
-  theme_bw()+
-  theme(legend.position = "bottom")+
-  ylab("Station code") + 
-  xlab("Date")
-p
-
-#Saving the plot!!
-ggsave(
-  p, 
-  file = opt$out, 
-  width = 11,
-  height = 8.50
-)

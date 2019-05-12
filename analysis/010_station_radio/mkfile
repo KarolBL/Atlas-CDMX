@@ -1,11 +1,11 @@
 <config.mk
 
-#Obtain the station location and contaminant distribution
-results/stations.pdf:	data/contaminants
+#Obtain the station radio for each contaminant distribution
+results/stations_radios.pdf:	data/missing
 	set -x
 	mkdir -p `dirname $target`
- 	Rscript bin/stations_map.R \
-		--contaminants "data/contaminants" \
+ 	Rscript bin/station_radio.R \
+		--contaminants "data/missing" \
 		--maps "data/09mun" \
 		--out $target".build.pdf" \
 		--cores $NT \

@@ -156,8 +156,15 @@ p <- ggplot(
   ylab("Latitude")+
   facet_wrap(Contaminant ~ ., nrow = 3, labeller = label_parsed)+
   theme_bw()+
-  annotation_scale()+
+  annotation_scale(
+    data = data.frame(
+      Contaminant = "NO"
+    )
+  )+
   annotation_north_arrow(
+    data = data.frame(
+      Contaminant = "NO"
+    ),
     #location = "bl",
     which_north = "TRUE",
     pad_x = unit(0, "in"),

@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "results/range_panel.pdf"
+

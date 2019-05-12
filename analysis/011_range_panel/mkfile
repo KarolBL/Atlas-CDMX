@@ -1,0 +1,11 @@
+<config.mk
+
+#Obtain the range panel 
+results/range_panel.pdf:
+	set -x
+	mkdir -p `dirname $target`
+ 	Rscript bin/range_panel.R \
+		--out $target".build.pdf" \
+		--cores $NT \
+	&& mv $target".build.pdf" $target
+

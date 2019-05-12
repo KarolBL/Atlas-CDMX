@@ -11,6 +11,7 @@ library("ggspatial")
 library("rgdal")
 library("sf")
 library("grDevices")
+library("dplyr")
 ############################################################
 option_list <- list(
   make_option(
@@ -118,7 +119,100 @@ boroughs <- spTransform(
 )
 polygons_boroughs_df <- fortify(boroughs, region="CVE_MUN")
 
+############################################################
+#Generate the contaminant radios according to the corresponding year
+ranges <- c(
+  "CO"  = 20.72, 
+  "NO2" = 43.37,
+  "O3" = 57.82, 
+  "SO2" = 5.92,
+  "PM25" = 13, 
+  "PM10" = 12.98, 
+  "NO" = 77.15, 
+  "NOX" = 84.44, 
+  "PMCO" = 28.04
+)
+ranges <- ranges * 1000 #in meters
 
+getRadio <- function(
+  contaminants, 
+  contaminant = "CO", 
+  Year = 2009,
+  ranges
+  ){
+    #Get the appropiate stations
+    ids <- subset(
+      contaminants,
+      year == Year &
+      pollutant == contaminant
+    )
+    ids <- unique(ids$station_code)
+    
+    if(length(ids) != 0 ){
+      #Get the coordinates
+      xy <- stations[stations$station_code %in% ids, c("lon", "lat")]
+      stations_sp <- SpatialPointsDataFrame(
+        coords = xy, 
+        data = stations[stations$station_code %in% ids, ],
+        proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
+      )
+      stations_sf <- st_as_sf(
+        stations_sp, 
+        coords = c("lon","lat"), 
+        crs = 4326
+      ) %>%
+      st_transform(3050)
+  
+      #Add the circles
+      stations_circles <- st_buffer(stations_sf, dist = ranges[contaminant])
+      stations_circles <- st_union(stations_circles)
+      stations_circles <- as_Spatial(stations_circles)
+      stations_circles <- spTransform(
+        stations_circles, 
+        CRS=CRS("+proj=longlat +datum=WGS84")
+      )
+      stations_circles_df <- fortify(stations_circles) #, region="CVE_MUN")
+      stations_circles_df$pollutant <- contaminant
+      stations_circles_df$year <- Year 
+      
+      return(stations_circles_df)
+    }else{
+      return(NA)
+    }
+}
+
+#For each contaminant
+radios <- lapply(
+  unique(contaminants$pollutant),
+  function(contaminant){
+    #For each year
+    out <- lapply(
+      years, 
+      function(Year){
+        getRadio(
+          contaminants, 
+          contaminant = contaminant, 
+          Year = Year,
+          ranges
+        )
+      }
+    )
+    do.call(rbind, na.omit(out))
+  }
+)
+
+radios <- do.call(rbind, radios)
+radios$ID <- paste(radios$pollutant, radios$year)
+radios <- na.omit(radios)
+radios$Contaminant <- factor(
+  as.character(radios$pollutant),
+  levels = c(
+    "CO", "NO2", "O3", "SO2", "PM25", "PM10", "NO", "NOX", "PMCO"
+  )
+)
+levels(radios$Contaminant) <- c(
+  "CO", "NO[2]", "O[3]", "SO[2]", "PM[25]", "PM[10]", "NO", "NO[X]", "PM[CO]"
+)
 
 ############################################################
 #Plot the stations
@@ -141,20 +235,27 @@ p <- ggplot(
     fill="transparent",
     color="black"
   )+
-  geom_point()+
+  geom_polygon(
+    data = radios,
+    aes(
+      x = long,
+      y = lat,
+      group = piece, 
+      color = Contaminant
+    ),
+    fill="transparent"
+  )+
+  geom_point( size = 1)+
+  annotation_scale(
+    data = data.frame(
+      Contaminant = "CO",
+      year = 2018
+    )
+  )+
   xlab("Longitude")+
   ylab("Latitude")+
   facet_grid(year ~ Contaminant, labeller = label_parsed)+
   theme_bw()+
-  # annotation_scale()+
-  # annotation_north_arrow(
-  #   #location = "bl",
-  #   which_north = "TRUE",
-  #   pad_x = unit(0, "in"),
-  #   pad_y = unit(0.2, "in"),
-  #   height = unit(.8, "cm"), width = unit(.8, "cm"),
-  #   style = north_arrow_fancy_orienteering
-  # )+
   coord_sf(crs = 4326)+
   theme(
     panel.grid = element_line(colour = "transparent"),
@@ -166,13 +267,10 @@ p
 ggsave(
   p,
   file = opt$out, 
-  width = 5.5,
+  width = 15,
   height = 8,
   device = cairo_pdf 
 )
-
-
-
 
 
 #Format the data

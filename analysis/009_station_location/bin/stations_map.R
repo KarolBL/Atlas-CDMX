@@ -7,6 +7,10 @@ library("optparse")
 library("parallel")
 library("reshape")
 library("ggplot2")
+library("ggspatial")
+library("rgdal")
+library("sf")
+library("grDevices")
 ############################################################
 option_list <- list(
   make_option(
@@ -52,7 +56,7 @@ if(is.null(opt$contaminants)){
 # Debuging
 # opt$contaminants <- "../data/contaminants"
 # opt$maps <- "../data/09mun"
-# opt$out <- "../results/sations.pdf"
+# opt$out <- "../results/stations.pdf"
 options(mc.cores = opt$cores)
 ############################################################
 #Load the contaminants to build stations contaminants matrix
@@ -115,8 +119,17 @@ levels(contaminants$Contaminant) <- c(
   "CO", "NO[2]", "O[3]", "SO[2]", "PM[25]", "PM[10]", "NO", "NO[X]", "PM[CO]")
 
 ############################################################
-#Loading 
-  
+#Loading shape files
+boroughs <- readOGR(
+  dsn = opt$maps, 
+  layer = '09mun'
+)
+boroughs <- spTransform(
+  boroughs, 
+  CRS=CRS("+proj=longlat +datum=WGS84")
+)
+polygons_boroughs_df <- fortify(boroughs, region="CVE_MUN")
+
 ############################################################
 #Plot the stations
 
@@ -129,14 +142,43 @@ p <- ggplot(
   )
 )+
   geom_point()+
+  geom_polygon(
+    data = polygons_boroughs_df, 
+    aes(
+      x = long,
+      y = lat,
+      group = group
+    ), 
+    fill="transparent", 
+    color="black"
+  )+
   xlab("Longitude")+
   ylab("Latitude")+
-  facet_wrap(Contaminant ~ ., ncol = 2, labeller = label_parsed)+
+  facet_wrap(Contaminant ~ ., nrow = 3, labeller = label_parsed)+
   theme_bw()+
+  annotation_scale()+
+  annotation_north_arrow(
+    #location = "bl",
+    which_north = "TRUE",
+    pad_x = unit(0, "in"),
+    pad_y = unit(0.2, "in"),
+    height = unit(.8, "cm"), width = unit(.8, "cm"),
+    style = north_arrow_fancy_orienteering
+  )+
+  coord_sf(crs = 4326)+
   theme(
-    legend.position = "NULL"
+    panel.grid = element_line(colour = "transparent"),
+    legend.position = "NULL",
+    axis.text.x = element_text(angle = 35, hjust = 1)
   )
 p
 
+ggsave(
+  p,
+  file = opt$out, 
+  width = 5.5,
+  height = 8,
+  device = cairo_pdf 
+)
 
 

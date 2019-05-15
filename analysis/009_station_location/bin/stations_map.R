@@ -9,6 +9,7 @@ library("reshape")
 library("ggplot2")
 library("ggspatial")
 library("rgdal")
+library("rgeos")
 library("sf")
 library("grDevices")
 ############################################################
@@ -131,17 +132,55 @@ boroughs <- spTransform(
 polygons_boroughs_df <- fortify(boroughs, region="CVE_MUN")
 
 ############################################################
+##Get borough centroids
+centroids_boroughs <- gCentroid(
+  boroughs,
+  byid = TRUE
+)
+
+centroids_lonlat <- spTransform(
+  centroids_boroughs, 
+  CRS("+proj=longlat +ellps=WGS84 +datum=WGS84")
+)
+centroids_lonlat <- coordinates(centroids_lonlat)
+colnames(centroids_lonlat) <- c("lon", "lat")
+centroids_lonlat <- as.data.frame(centroids_lonlat)
+
+levels(contaminants$Contaminant) <- c(
+  levels(contaminants$Contaminant),
+  "Borough", "Stations"
+)
+
+station_location <- unique(contaminants[, -2])
+station_location <- station_location[
+  order(station_location$station),
+] 
+station_location$number <- 1:nrow(station_location)
+station_location$Contaminant <- "Stations"
+station_location$Contaminant <- factor(
+  station_location$Contaminant,
+  levels = levels(contaminants$Contaminant)
+)
+  
+centroids_lonlat$Contaminant <- "Borough"
+centroids_lonlat$Contaminant <- factor(
+  centroids_lonlat$Contaminant,
+  levels = levels(contaminants$Contaminant)
+)
+centroids_lonlat$text <- 1:nrow(centroids_lonlat)
+
+############################################################
 #Plot the stations
 
-p <- ggplot(
-  data = contaminants,
-  aes(
-    x = lon,
-    y = lat,
-    colour = Contaminant
-  )
-)+
-  geom_point()+
+p <- ggplot()+
+  geom_point(
+    data = contaminants,
+    aes(
+      x = lon,
+      y = lat,
+      colour = Contaminant
+    )
+  )+
   geom_polygon(
     data = polygons_boroughs_df, 
     aes(
@@ -152,18 +191,52 @@ p <- ggplot(
     fill="transparent", 
     color="black"
   )+
+  geom_text(
+    data = centroids_lonlat,
+    aes(
+      x = lon,
+      y = lat,
+      label = text
+    ),
+    size = 2,
+    colour = "blue" 
+  )+
+  geom_point(
+    data = station_location,
+    aes(
+      x = lon,
+      y = lat
+    ),
+    shape = 21,
+    size = 3,
+    fill = "white"
+  )+
+  geom_text(
+    data = station_location,
+    aes(
+      x = lon,
+      y = lat,
+      label = number
+    ),
+    size = 2,
+    colour = "red" 
+  )+
   xlab("Longitude")+
   ylab("Latitude")+
-  facet_wrap(Contaminant ~ ., nrow = 3, labeller = label_parsed)+
+  facet_wrap(
+    Contaminant ~ ., 
+    ncol = 4, 
+    labeller = label_parsed
+  )+
   theme_bw()+
   annotation_scale(
     data = data.frame(
-      Contaminant = "NO"
+      Contaminant = "PM[CO]"
     )
   )+
   annotation_north_arrow(
     data = data.frame(
-      Contaminant = "NO"
+      Contaminant = "PM[CO]"
     ),
     #location = "bl",
     which_north = "TRUE",
@@ -176,16 +249,18 @@ p <- ggplot(
   theme(
     panel.grid = element_line(colour = "transparent"),
     legend.position = "NULL",
-    axis.text.x = element_text(angle = 35, hjust = 1)
+    axis.text.x = element_text(angle = 90, hjust = 1)
   )
 p
 
 ggsave(
   p,
   file = opt$out, 
-  width = 5.5,
+#  ncol = 2  
+#  width = 5.5, 
+#  height = 8,
+  width = 7, 
   height = 8,
   device = cairo_pdf 
 )
-
 

@@ -1,0 +1,6 @@
+#!/bin/bash
+find -L data/filtered \
+       -type f \
+       -name "*.RData" \
+| sed -r \
+	-e "s#^data/filtered#results#g" 

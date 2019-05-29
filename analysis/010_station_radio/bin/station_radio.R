@@ -271,3 +271,74 @@ ggsave(
   height = 8,
   device = cairo_pdf 
 )
+
+########################################################################
+contaminants2 <- subset(
+  contaminants,
+  pollutant %in% c("NO", "NOX") &
+  #pollutant %in% c("SO2", "PM25") &
+  year == 2018
+)
+contaminants2$Contaminant <- droplevels(contaminants2$Contaminant)
+radios2 <- subset(
+  radios,
+  pollutant %in% c("NO", "NOX") &
+  #pollutant %in% c("SO2", "PM25") &
+  year == 2018
+)
+
+p <- ggplot(
+  data = contaminants2,
+  aes(
+    x = lon,
+    y = lat,
+    colour = Contaminant
+  )
+)+
+  geom_polygon(
+    data = polygons_boroughs_df,
+    aes(
+      x = long,
+      y = lat,
+      group = group
+    ),
+    fill="transparent",
+    color="black"
+  )+
+  geom_polygon(
+    data = radios2,
+    aes(
+      x = long,
+      y = lat,
+      group = piece, 
+      color = Contaminant
+    ),
+    fill="transparent"
+  )+
+  geom_point( size = 1)+
+  annotation_scale(
+    data = data.frame(
+      Contaminant = "NO",
+      year = 2018
+    )
+  )+
+  xlab("Longitude")+
+  ylab("Latitude")+
+  facet_grid(. ~ Contaminant , labeller = label_parsed)+
+  theme_bw()+
+  coord_sf(crs = 4326)+
+  theme(
+    panel.grid = element_line(colour = "transparent"),
+    legend.position = "NULL",
+    axis.text.x = element_text(angle = 35, hjust = 1)
+  )
+p
+
+ggsave(
+  p,
+  #file = "SO2PM25.pdf", 
+  file = "NONOX.pdf",
+  width = 8,
+  height = 5,
+  device = cairo_pdf 
+)
